@@ -316,3 +316,4 @@ export const skeletonLinePurple = (width = '80%', delay = 0) => ({
   animation:        'pulse 1.2s ease-in-out infinite',
   animationDelay:   `${delay}s`,
 });
+
