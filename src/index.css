@@ -1,0 +1,169 @@
+/* ═══════════════════════════════════════════════════════
+   AI COUNCIL — GLOBAL STYLES
+═══════════════════════════════════════════════════════ */
+
+/* ── Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base — force dark everywhere, kill white flash ── */
+html {
+  background: #06060d;
+  /* prevent iOS/Android from flashing white */
+  -webkit-tap-highlight-color: transparent;
+  /* lock to dark color scheme so browser chrome matches */
+  color-scheme: dark;
+}
+
+body,
+#root {
+  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport for mobile (handles URL bar) */
+  background: #06060d;
+  color: #e8e6f0;
+  font-family: 'Syne', 'DM Sans', sans-serif;
+  /* prevent horizontal scroll on mobile */
+  overflow-x: hidden;
+}
+
+/* ── Form elements ── */
+input,
+select,
+textarea {
+  color-scheme: dark;
+  outline: none;
+  font-family: inherit;
+  /* prevent iOS zoom on focus (font-size must be >= 16px on mobile) */
+  font-size: 16px;
+}
+
+/* override back to 14px on larger screens */
+@media (min-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 14px;
+  }
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(167, 139, 250, 0.5) !important;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus {
+  outline: none;
+}
+
+select option {
+  background: #111;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border-radius: 3px;
+}
+
+/* ── Mobile safe area insets (notch / home bar) ── */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE UTILITIES
+══════════════════════════════════════ */
+
+/* Hide on mobile */
+@media (max-width: 639px) {
+  .hide-mobile { display: none !important; }
+}
+
+/* Hide on desktop */
+@media (min-width: 640px) {
+  .hide-desktop { display: none !important; }
+}
+
+/* ══════════════════════════════════════
+   KEYFRAME ANIMATIONS
+══════════════════════════════════════ */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}

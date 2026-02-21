@@ -84,7 +84,7 @@ Your Question
 ### Install & Run
 
 ```bash
-git clone https://github.com/yourusername/ai-council.git
+git clone https://github.com/prijak/Ai-council.git
 cd ai-council
 npm install
 npm run dev
@@ -234,4 +234,5 @@ MIT — do whatever you want with it.
 ---
 
 _Built with React. Runs entirely in your browser. No servers harmed._
+
 # Ai-council
