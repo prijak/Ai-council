@@ -52,11 +52,17 @@ Your Question
 
 ## ✦ Screenshots
 
+Home Screen:
 ![Homne Screen](screenshots/home.jpeg)
+Configure Member
 ![Configure Member](screenshots/configureMember.jpeg)
+
 ![Configure Member](screenshots/configureMember2.jpeg)
+Results View
 ![Results View](screenshots/FirstOpenion.jpeg)
+Manage Members
 ![Manage Members](screenshots/Manage.jpeg)
+Final Verdict
 ![Final Verdict](screenshots/Virdict.jpeg)
 
 ---
