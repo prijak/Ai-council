@@ -63,13 +63,14 @@ Your Question
 
 - **Multi-provider** — Ollama, OpenAI, Groq, Anthropic, Google, or any OpenAI-compatible endpoint
 - **Mix local + cloud** — run DeepSeek-R1 locally alongside Claude or GPT-4o
-- **35 built-in personas** across Think Tank, Corporate, Startup, Consulting, Editorial, Medical, and Legal roles
+- **36 built-in personas** across Think Tank, Corporate, Startup, Consulting, Editorial, Medical, Legal, and Unfiltered roles
+- **Raw Model persona** — no role-play, no framing: the model responds from its own knowledge and judgment
 - **Streaming responses** — watch all models think in real time, switch tabs mid-generation without losing data
 - **Think-block stripping** — `<think>` blocks from reasoning models (DeepSeek-R1, QwQ) are hidden; only the final answer is shown, with a live "🧠 Thinking…" indicator
 - **Tabbed results UI** — Stage I / II / III tabs, switch freely while generation is in progress
 - **Session history** — all past queries stored locally, reviewable in a full modal with per-stage tabs
 - **Saved configs** — save provider + model + API key combos for quick reuse
-- **Mobile friendly** — responsive layout, no white flash, safe area insets, iOS zoom prevention
+- **Mobile friendly** — responsive layout, horizontal member strip on mobile, no white flash, safe area insets, iOS zoom prevention
 - **Fully local-first** — no backend, no telemetry, runs entirely in the browser
 
 ### New Features
@@ -102,7 +103,7 @@ A fresh `AbortController` is created per run; the signal is passed through all f
 
 #### ✨ Council Templates
 
-Pre-built persona structures in one click — no manual setup needed. Templates load persona and name structure only; you still set provider, model, and API key per member. 11 templates across four categories.
+Pre-built persona structures in one click — no manual setup needed. Templates load persona and name structure only; you still set provider, model, and API key per member. 13 templates across four categories, including two new Unfiltered templates for raw model deliberation.
 
 #### 📥 / 📤 Import / Export Council JSON
 
@@ -188,6 +189,51 @@ ai-council/
 
 ---
 
+## ✦ Project Structure
+
+```
+ai-council/
+├── public/
+│   ├── logo.png
+│   └── vite.svg
+├── screenshots/
+├── src/
+│   ├── components/
+│   │   ├── atoms/
+│   │   │   └── index.jsx          # Shared primitives: Spin, Badge, TemperatureSlider
+│   │   ├── DeliberationScreen.jsx # Main orchestrator — runs query pipeline, manages state
+│   │   ├── HistoryModal.jsx       # Past sessions browser with per-stage tabs
+│   │   ├── ManagePanel.jsx        # Slide-in panel: add, edit, remove council members
+│   │   ├── MemberCard.jsx         # Single member row with chairman toggle and edit
+│   │   ├── MemberForm.jsx         # Add / edit member form (provider, model, persona, key)
+│   │   ├── ResultsView.jsx        # Stage I / II / III tabbed results display
+│   │   ├── SavedConfig.jsx        # Saved provider+model config management
+│   │   ├── SettingsModal.jsx      # Webhook URL config and test ping
+│   │   ├── SetupScreen.jsx        # Initial council builder — template picker + member setup
+│   │   ├── SystemPromptEditor.jsx # Inline system prompt preview and custom editing
+│   │   └── TemplateCard.jsx       # Template grid card with category + member preview
+│   ├── constants/
+│   │   ├── personas.js            # 36 personas across 8 groups including Raw Model
+│   │   ├── providers.js           # Provider configs: Ollama, OpenAI, Groq, Anthropic, Google, Custom
+│   │   └── templates.js           # 13 council templates across 4 categories
+│   ├── lib/
+│   │   ├── api.js                 # dispatchMember(), fireWebhook() — all provider fetch logic
+│   │   ├── export.js              # downloadMarkdown(), exportPDF()
+│   │   ├── storage.js             # loadSessions(), persistSessions(), saved config helpers
+│   │   └── utils.js               # stripThinking(), isThinking(), sid()
+│   ├── App.jsx                    # Root — routes between SetupScreen and DeliberationScreen
+│   ├── index.css                  # Global reset, fonts, keyframe animations
+│   ├── main.jsx                   # React entry point
+│   └── styles.js                  # Design tokens, shared style objects (tokens, cardStyles, etc.)
+├── .project
+├── eslint.config.js
+├── index.html
+├── nginx.conf
+└── package.json
+```
+
+---
+
 ## ✦ Ollama Setup
 
 Ollama needs CORS enabled to accept browser requests:
@@ -231,11 +277,20 @@ ollama pull deepseek-v2        # Good for The Philosopher
 | Local Expert     | Ollama    | `deepseek-r1:latest`      | Philosopher   |
 | The Synthesizer  | Anthropic | `claude-sonnet-4-6`       | Pragmatist 👑 |
 
+### Raw Model Panel (compare models unfiltered)
+
+| Member  | Provider  | Model                     | Persona      |
+| ------- | --------- | ------------------------- | ------------ |
+| Model A | Anthropic | `claude-sonnet-4-6`       | Raw Model    |
+| Model B | Groq      | `llama-3.3-70b-versatile` | Raw Model    |
+| Model C | OpenAI    | `gpt-4o`                  | Raw Model    |
+| Model D | Google    | `gemini-2.0-flash`        | Raw Model 👑 |
+
 ---
 
 ## ✦ Council Templates
 
-Templates load a pre-built persona structure in one click. You still set provider, model, and API key per member after loading. Templates are organized into three categories.
+Templates load a pre-built persona structure in one click. You still set provider, model, and API key per member after loading.
 
 ### 🧠 Think Tank
 
@@ -261,6 +316,13 @@ Templates load a pre-built persona structure in one click. You still set provide
 | **📰 Editorial Team** | Reporter + Editor + Legal Review + SEO + Editor-in-Chief 👑                       | Publishing decisions, story clearance, content strategy |
 | **🏥 Hospital Team**  | GP + Specialist + Pharmacist + Medical Ethicist + Chief of Medicine 👑            | Clinical questions, medical case analysis               |
 | **⚖️ Law Firm**       | Litigator + Corporate Counsel + Compliance + Junior Associate + Senior Partner 👑 | Legal risk assessment, deal review, compliance mapping  |
+
+### 🔬 Unfiltered
+
+| Template               | Members                                          | Best for                                                         |
+| ---------------------- | ------------------------------------------------ | ---------------------------------------------------------------- |
+| **🔬 Raw Model Panel** | 4× Raw Model (last one is Chairman)              | Comparing models on the same question with zero persona bias     |
+| **⚗️ Raw vs Persona**  | Raw Model + Analyst + Contrarian + Pragmatist 👑 | Seeing how persona framing changes output vs raw model reasoning |
 
 ---
 
@@ -336,9 +398,14 @@ Templates load a pre-built persona structure in one click. You still set provide
 | **The Junior Associate**          | Detail-level review — ambiguous clauses, missed deadlines                  |
 | **The Senior Partner (Chairman)** | The firm's definitive legal position — frank, precise, strategically sound |
 
-### Custom
+### Unfiltered
 
-Define your own system prompt — any domain, any role.
+| Persona       | Role                                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------------------- |
+| **Raw Model** | No persona, no role, no framing. The model answers from its own knowledge and judgment — pure signal. |
+| **Custom ✎**  | Define your own system prompt — any domain, any role.                                                 |
+
+> **When to use Raw Model:** Factual questions, technical comparisons, anything where you want to know what the model actually thinks rather than what a persona would say. Pair multiple Raw Model members across different providers to see where models genuinely agree or diverge.
 
 ---
 
@@ -351,7 +418,7 @@ The Chairman receives the full deliberation transcript (all responses + all peer
 - Eliminate redundancy and weak reasoning
 - Deliver a direct, unambiguous final answer
 
-The Pragmatist / CEO / Senior Partner personas are auto-suggested for Chairman because synthesis is fundamentally about decision-making, not description.
+The Pragmatist / CEO / Senior Partner personas are auto-suggested for Chairman because synthesis is fundamentally about decision-making, not description. The Raw Model persona can also serve as Chairman for unfiltered synthesis.
 
 ---
 
@@ -414,22 +481,6 @@ Reasoning models like `deepseek-r1` and `qwq` emit `<think>...</think>` blocks b
 - An unclosed `<think>` (model still reasoning mid-stream) shows a `🧠 Thinking deeply…` indicator
 - Stored text contains only the actual answer
 - Peer review and Chairman synthesis prompts only receive cleaned answers — no thinking noise leaks between stages
-
----
-
-## ✦ Project Structure
-
-```
-ai-council/
-├── src/
-│   ├── App.jsx          # All components and logic
-│   ├── styles.js        # Design tokens and shared style objects
-│   └── index.css        # Global reset, fonts, keyframes
-├── screenshots/         # README screenshots
-├── index.html
-├── nginx.conf           # For Docker deployment
-└── package.json
-```
 
 ---
 
