@@ -12,12 +12,45 @@
   ╚═══════════════════════════════════════════╝
 ```
 
+### 🇮🇳 Built with ❤️ in Bharat · Powered by Sarvam AI
+
+[![Made in India](https://img.shields.io/badge/Made%20in-Bharat%20🇮🇳-f97316.svg)](#)
+[![Powered by Sarvam AI](https://img.shields.io/badge/Powered%20by-Sarvam%20AI-f97316.svg)](https://sarvam.ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-a78bfa.svg)](LICENSE)
-[![React](https://img.shields.io/badge/React-18-60a5fa.svg)](https://react.dev)
+[![React](https://img.shields.io/badge/React-19-60a5fa.svg)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Build-Vite-34d399.svg)](https://vitejs.dev)
-[![Zero Backend](https://img.shields.io/badge/Backend-None-f472b6.svg)](#)
+[![Firebase](https://img.shields.io/badge/Auth-Firebase-f59e0b.svg)](https://firebase.google.com)
+[![PWA](https://img.shields.io/badge/PWA-Ready-a78bfa.svg)](#-pwa--install-to-home-screen)
+
+---
+
+> **🔥 Free hosted AI — no API key needed.**
+> Sign in with Google and instantly access **Sarvam AI** (India's own LLM) and **Hosted Ollama** — free for all users. No credit card, no setup.
+
+---
 
 </div>
+
+## 🇮🇳 Sarvam AI — India's Own LLM, Built into AI Council
+
+[Sarvam AI](https://sarvam.ai) is an Indian large language model built for Bharat — designed to understand Indian context, culture, and languages. It is fully integrated into AI Council as a **first-class hosted provider**, available free to all signed-in users.
+
+**Why Sarvam AI?**
+
+- Built in India, by Indians, for Indian use cases
+- Understands Indian cultural and business context natively
+- Supports Indic language inputs and multilingual reasoning
+- No API key required — sign in with Google and use it instantly
+- Available in both Council mode and Agent Chat mode
+
+**How to use it:**
+
+1. Click **Sign in with Google** (top right)
+2. Add a council member → select **Sarvam AI 🇮🇳** as the provider
+3. Model is pre-set to `sarvam-m` — no configuration needed
+4. Run your query — Sarvam AI deliberates alongside any other models you choose
+
+> Pair Sarvam AI with Hosted Ollama for a **100% free, zero-setup council** — no API keys anywhere.
 
 ---
 
@@ -61,8 +94,8 @@ Your Question
 
 ### Core
 
-- **Multi-provider** — Ollama, OpenAI, Groq, Anthropic, Google, or any OpenAI-compatible endpoint
-- **Mix local + cloud** — run DeepSeek-R1 locally alongside Claude or GPT-4o
+- **Multi-provider** — Ollama, OpenAI, Groq, Anthropic, Google, **Sarvam AI 🇮🇳**, or any OpenAI-compatible endpoint
+- **Mix local + cloud** — run DeepSeek-R1 locally alongside Claude, GPT-4o, or Sarvam AI
 - **36 built-in personas** across Think Tank, Corporate, Startup, Consulting, Editorial, Medical, Legal, and Unfiltered roles
 - **Raw Model persona** — no role-play, no framing: the model responds from its own knowledge and judgment
 - **Streaming responses** — watch all models think in real time, switch tabs mid-generation without losing data
@@ -70,14 +103,60 @@ Your Question
 - **Tabbed results UI** — Stage I / II / III tabs, switch freely while generation is in progress
 - **Session history** — all past queries stored locally, reviewable in a full modal with per-stage tabs
 - **Saved configs** — save provider + model + API key combos for quick reuse
-- **Mobile friendly** — responsive layout, horizontal member strip on mobile, no white flash, safe area insets, iOS zoom prevention
-- **Fully local-first** — no backend, no telemetry, runs entirely in the browser
+- **Mobile friendly** — responsive layout, no white flash, safe area insets, iOS zoom prevention
 
-### New Features
+---
 
-#### 🌡 Temperature / Creativity Slider
+## ✦ New Features
 
-Set precision vs. creativity per query before convening. Implemented via `TemperatureSlider` component — sits inside the query input box. Applied uniformly to all members including the Chairman across every provider (Ollama via `options.temperature`, OpenAI/Groq/Custom in body, Anthropic + Google in their respective fields).
+### 🔐 Google Sign-In & Firebase Authentication
+
+Sign in with your Google account to unlock cloud features and free hosted models. Uses Firebase Auth with popup → redirect fallback — works on all browsers including iOS Safari.
+
+- Managed providers (Sarvam AI, Hosted Ollama) require sign-in
+- Session persists across tabs and page reloads
+- Anonymous users continue to work with local storage and self-hosted providers
+
+### ☁ Cloud Config Sync with End-to-End Encryption
+
+When signed in, your saved council configs sync to Firestore. API keys are encrypted with **AES-GCM 256-bit** (WebCrypto) before leaving your browser — the server only ever stores ciphertext.
+
+- Configs sync across devices automatically
+- Each saved config card shows a `☁ cloud · 🔒 encrypted` badge when active
+- Falls back to localStorage for anonymous sessions
+
+### 🇮🇳 Managed / Hosted Providers (No API Key Required)
+
+Two providers are hosted by the AI Council backend — sign in and use them free:
+
+| Provider          | Icon | Notes                                                                   |
+| ----------------- | ---- | ----------------------------------------------------------------------- |
+| **Sarvam AI**     | 🇮🇳   | India's own LLM (`sarvam-m`) — built for Bharat                         |
+| **Hosted Ollama** | 🦙   | Free open-source models — mistral-nemo, deepseek-r1, llama3.1, and more |
+
+No endpoint, no API key, no credit card. Just sign in.
+
+### 🖥 Express Backend & Usage Analytics
+
+Node.js/Express backend (`server.js`) powers managed providers with Firebase Admin auth verification, per-UID rate limiting (30 req/min default), streaming proxy, Firestore usage analytics, session logging, and an admin stats endpoint.
+
+### 🤖 Agent Mode
+
+Single-model 1-on-1 chat with any persona — CEO, Analyst, Coach, Lawyer, and more. Accessible from the setup screen. Supports all providers including Sarvam AI 🇮🇳 and Hosted Ollama for zero-setup conversations.
+
+### ✏ Custom Persona Creator
+
+Build council members beyond the 36 built-ins — define a name, icon, color, and full system prompt. Useful for domain-specific Indian roles: GST Compliance Officer, SEBI Regulatory Advisor, IIT Research Analyst, and so on.
+
+### 📱 PWA — Install to Home Screen
+
+AI Council is a fully installable Progressive Web App. Chrome/Edge/Android shows a native install banner. iOS Safari: tap **Share → Add to Home Screen**. Runs standalone once installed.
+
+---
+
+## ✦ Previously Shipped Features
+
+### 🌡 Temperature / Creativity Slider
 
 | Range   | Label       | Effect                               |
 | ------- | ----------- | ------------------------------------ |
@@ -85,33 +164,29 @@ Set precision vs. creativity per query before convening. Implemented via `Temper
 | 35–65%  | Balanced    | Default — good for most questions    |
 | 65–100% | 🎨 Creative | More varied, exploratory, unexpected |
 
-#### 🔗 Follow-up Questions
+### 🔗 Follow-up Questions
 
-After a verdict is delivered, a follow-up bar appears at the bottom. Follow-up queries prepend all prior rounds as context (`contextPrefix`) so the council builds on its own conclusions. Each round is saved in `followUpChain` and shown in History. The council carries the full prior verdict forward into every subsequent round, building a multi-round deliberation chain.
+After a verdict, ask a follow-up — the council carries the full prior verdict as context. Each round is saved in `followUpChain` and shown in History.
 
-#### ⬛ Abort / Cancel Mid-Run
+### ⬛ Abort / Cancel Mid-Run
 
-A fresh `AbortController` is created per run; the signal is passed through all fetch calls. Cancel button appears in the header only while running. On cancel: partial results are preserved, a red banner is displayed, and follow-up is still available.
+Cancel at any point — partial results are preserved, a red banner is shown, and follow-up is still available.
 
-#### 📤 Export as Markdown
+### 📤 Export as Markdown / 🖨 PDF
 
-`downloadMarkdown()` builds a structured `.md` report with date, temperature, all responses, peer reviews, and verdict. Downloads directly from the query bar or History modal once a verdict exists.
+`downloadMarkdown()` builds a structured `.md` report. `exportPDF()` opens a print-ready styled browser window.
 
-#### 🖨 Export as PDF
+### ✨ Council Templates
 
-`exportPDF()` opens a print-ready styled browser window. Use browser Print → Save as PDF. Buttons appear in the results toolbar and History modal.
+13 pre-built persona structures across Think Tank, Corporate, Professional, and Unfiltered categories — one click to load.
 
-#### ✨ Council Templates
+### 📥 / 📤 Import / Export Council JSON
 
-Pre-built persona structures in one click — no manual setup needed. Templates load persona and name structure only; you still set provider, model, and API key per member. 13 templates across four categories, including two new Unfiltered templates for raw model deliberation.
+Save and reload full council setups. API keys are always stripped from exports.
 
-#### 📥 / 📤 Import / Export Council JSON
+### 🔗 Webhook Output
 
-Save and reload your full council setup. Export downloads `ai-council-config.json` with API keys stripped. Import via file picker — parses `{ members: [...] }` or a bare array. Both show inline success/error feedback.
-
-#### 🔗 Webhook Output
-
-Configure a webhook URL in Settings. After every completed session, AI Council POSTs the full session JSON. Includes a test ping button with live response status. Works with Zapier, Make, n8n, Slack, Notion, Pipedream, or any HTTP endpoint.
+Configure a webhook URL in Settings. After every completed session, AI Council POSTs the full session JSON. Works with Zapier, Make, n8n, Slack, Notion, and Pipedream.
 
 ---
 
@@ -137,14 +212,19 @@ Final Verdict:
 
 ## ✦ Tech Stack
 
-| Layer     | Choice                                              |
-| --------- | --------------------------------------------------- |
-| Framework | React 18                                            |
-| Styling   | Inline styles + CSS (no Tailwind, no CSS-in-JS lib) |
-| Fonts     | Syne + DM Sans (Google Fonts)                       |
-| Storage   | `window.storage` (persistent browser storage)       |
-| Build     | Vite                                                |
-| Runtime   | 100% client-side, zero backend                      |
+| Layer         | Choice                                                 |
+| ------------- | ------------------------------------------------------ |
+| Framework     | React 19                                               |
+| Styling       | Inline styles + CSS (no Tailwind, no CSS-in-JS lib)    |
+| Fonts         | Syne + DM Sans (Google Fonts)                          |
+| Auth          | Firebase Authentication (Google Sign-In)               |
+| Database      | Firestore (cloud config sync, usage analytics)         |
+| Encryption    | WebCrypto AES-GCM 256 (client-side, before upload)     |
+| Local Storage | `localStorage` (sessions, configs for anonymous users) |
+| Backend       | Node.js + Express (managed providers, analytics)       |
+| Indic AI      | Sarvam AI 🇮🇳 (`sarvam-m`)                              |
+| Build         | Vite 6                                                 |
+| PWA           | vite-plugin-pwa + custom Service Worker                |
 
 ---
 
@@ -153,7 +233,7 @@ Final Verdict:
 ### Prerequisites
 
 - Node.js 18+
-- At least one of: Ollama running locally, or an API key for a cloud provider
+- One of: Ollama locally, a cloud provider API key, **or just a Google account** to use free managed providers (Sarvam AI + Hosted Ollama)
 
 ### Install & Run
 
@@ -164,28 +244,63 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser.
+Open `http://localhost:5173`.
+
+### Firebase Setup (optional — for auth + cloud sync + managed providers)
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Enable **Authentication → Google** sign-in provider
+3. Enable **Firestore** database
+4. Copy your config into `.env`:
+
+```env
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+VITE_FIREBASE_MEASUREMENT_ID=...
+VITE_API_URL=https://your-backend-url.com
+```
+
+Without these, the app runs in local-only mode (no sign-in, no cloud sync, no managed providers).
+
+### Backend Setup (optional — for Sarvam AI + Hosted Ollama)
+
+```bash
+PORT=8103 \
+OLLAMA_BASE_URL=https://your-ollama.com \
+SARVAM_API_KEY=sk-... \
+MANAGED_OLLAMA_MODELS=mistral-nemo:latest,deepseek-r1:latest,llama3.1:8b \
+ADMIN_UIDS=uid1,uid2 \
+node server.js
+```
+
+Requires Firebase Admin credentials (`GOOGLE_APPLICATION_CREDENTIALS` or GCP ADC).
+
+**Backend environment variables:**
+
+| Variable                | Default                     | Description                     |
+| ----------------------- | --------------------------- | ------------------------------- |
+| `PORT`                  | `8103`                      | Server port                     |
+| `OLLAMA_BASE_URL`       | `https://ai.gameinghub.com` | Your Ollama instance            |
+| `SARVAM_API_KEY`        | —                           | Sarvam AI API key               |
+| `MANAGED_OLLAMA_MODELS` | —                           | Comma-separated model list      |
+| `ADMIN_UIDS`            | —                           | Firebase UIDs with admin access |
+| `ALLOWED_ORIGINS`       | `*`                         | CORS origins                    |
+| `RATE_LIMIT_PER_MIN`    | `30`                        | Max requests per UID/minute     |
 
 ---
 
 ## ✦ Docker
-
-Everything is included — just build and run:
 
 ```bash
 docker build -f ui_dockerfile -t ai-council .
 docker run -p 8080:80 ai-council
 ```
 
-Open `http://localhost:8080`.
-
-No config needed. The repo includes both `Dockerfile` and `nginx.conf`. The build compiles the React app and serves it via nginx. API calls go from the user's browser directly to providers — nothing routes through Docker.
-
-```
-ai-council/
-├── ui_dockerfile    # Multi-stage: node:20-alpine build → nginx:alpine serve
-└── nginx.conf       # SPA routing + static asset caching
-```
+Open `http://localhost:8080`. The Docker image builds the React app and serves via nginx.
 
 ---
 
@@ -195,40 +310,48 @@ ai-council/
 ai-council/
 ├── public/
 │   ├── logo.png
-│   └── vite.svg
-├── screenshots/
+│   ├── manifest.json              # PWA manifest
+│   └── sw.js                      # Service worker
 ├── src/
 │   ├── components/
-│   │   ├── atoms/
-│   │   │   └── index.jsx          # Shared primitives: Spin, Badge, TemperatureSlider
-│   │   ├── DeliberationScreen.jsx # Main orchestrator — runs query pipeline, manages state
-│   │   ├── HistoryModal.jsx       # Past sessions browser with per-stage tabs
-│   │   ├── ManagePanel.jsx        # Slide-in panel: add, edit, remove council members
-│   │   ├── MemberCard.jsx         # Single member row with chairman toggle and edit
-│   │   ├── MemberForm.jsx         # Add / edit member form (provider, model, persona, key)
-│   │   ├── ResultsView.jsx        # Stage I / II / III tabbed results display
-│   │   ├── SavedConfig.jsx        # Saved provider+model config management
-│   │   ├── SettingsModal.jsx      # Webhook URL config and test ping
-│   │   ├── SetupScreen.jsx        # Initial council builder — template picker + member setup
-│   │   ├── SystemPromptEditor.jsx # Inline system prompt preview and custom editing
-│   │   └── TemplateCard.jsx       # Template grid card with category + member preview
+│   │   ├── atoms/index.jsx        # Spin, Badge, Toggle, TemperatureSlider
+│   │   ├── AgentScreen.jsx        # Single-model agent chat mode
+│   │   ├── AuthGate.jsx           # Firebase auth wrapper + Google sign-in UI
+│   │   ├── DeliberationScreen.jsx # Main 3-stage pipeline orchestrator
+│   │   ├── HistoryModal.jsx       # Past sessions browser
+│   │   ├── InstallPrompt.jsx      # PWA install banner
+│   │   ├── ManagePanel.jsx        # Add / edit / remove council members
+│   │   ├── MemberCard.jsx         # Member row + chairman toggle
+│   │   ├── MemberForm.jsx         # Add/edit member form
+│   │   ├── ModelPicker.jsx        # Searchable model picker
+│   │   ├── PersonaCreator.jsx     # Custom persona builder
+│   │   ├── ResultsView.jsx        # Stage I / II / III tabs
+│   │   ├── SavedConfig.jsx        # Local + cloud config management
+│   │   ├── SettingsModal.jsx      # Webhook config
+│   │   ├── SetupScreen.jsx        # Council builder + template picker
+│   │   ├── SystemPromptEditor.jsx # Inline prompt preview + editing
+│   │   └── TemplateCard.jsx       # Template grid card
 │   ├── constants/
-│   │   ├── personas.js            # 36 personas across 8 groups including Raw Model
-│   │   ├── providers.js           # Provider configs: Ollama, OpenAI, Groq, Anthropic, Google, Custom
-│   │   └── templates.js           # 13 council templates across 4 categories
+│   │   ├── personas.js            # 36 personas across 8 groups
+│   │   ├── providers.js           # All provider configs incl. managed_sarvam
+│   │   └── templates.js           # 13 council templates
 │   ├── lib/
-│   │   ├── api.js                 # dispatchMember(), fireWebhook() — all provider fetch logic
+│   │   ├── api.js                 # dispatchMember() — all provider fetch logic
+│   │   ├── auth.js                # Firebase auth, getIdToken, apiFetch, streaming proxy
+│   │   ├── cloudStorage.js        # Firestore CRUD + AES-GCM encryption
 │   │   ├── export.js              # downloadMarkdown(), exportPDF()
-│   │   ├── storage.js             # loadSessions(), persistSessions(), saved config helpers
-│   │   └── utils.js               # stripThinking(), isThinking(), sid()
-│   ├── App.jsx                    # Root — routes between SetupScreen and DeliberationScreen
-│   ├── index.css                  # Global reset, fonts, keyframe animations
-│   ├── main.jsx                   # React entry point
-│   └── styles.js                  # Design tokens, shared style objects (tokens, cardStyles, etc.)
-├── .project
-├── eslint.config.js
-├── index.html
+│   │   ├── importExportConfig.js  # parseCouncilJSON()
+│   │   ├── storage.js             # localStorage helpers
+│   │   └── utils.js               # stripThinking(), uid(), sid()
+│   ├── App.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   └── styles.js
+├── server.js                      # Express backend (managed providers + analytics)
+├── firestore.rules
+├── firebase.json
 ├── nginx.conf
+├── ui_dockerfile
 └── package.json
 ```
 
@@ -236,27 +359,37 @@ ai-council/
 
 ## ✦ Ollama Setup
 
-Ollama needs CORS enabled to accept browser requests:
-
 ```bash
 OLLAMA_ORIGINS="*" ollama serve
 ```
 
-Then pull any models you want:
+Recommended models:
 
 ```bash
-ollama pull deepseek-r1        # Reasoning model — great for The Analyst
-ollama pull llama3.1           # Good general purpose
-ollama pull mistral-nemo       # Efficient, good for Chairman synthesis
-ollama pull llama2-uncensored  # Uncensored — good for The Contrarian
-ollama pull deepseek-v2        # Good for The Philosopher
+ollama pull deepseek-r1        # Reasoning — great for The Analyst
+ollama pull llama3.1           # General purpose
+ollama pull mistral-nemo       # Efficient — good Chairman
+ollama pull llama2-uncensored  # Uncensored — good Contrarian
+ollama pull deepseek-v2        # Good Philosopher
 ```
 
-> **RTX 2070 / 8GB VRAM tip:** Stick to 7B–12B models with 4-bit quantization (Ollama's default). Ollama queues requests per endpoint, so all members run sequentially — expect 5–15 minutes per full deliberation.
+> **RTX 2070 / 8GB VRAM tip:** Stick to 7B–12B models with 4-bit quantization. Ollama queues requests sequentially — expect 5–15 min per full deliberation.
 
 ---
 
 ## ✦ Recommended Council Configurations
+
+### 🇮🇳 Zero-Setup Indian Council (sign-in only — completely free)
+
+| Member         | Provider      | Model                 | Persona       |
+| -------------- | ------------- | --------------------- | ------------- |
+| The Analyst    | Hosted Ollama | `deepseek-r1:latest`  | Analyst       |
+| The Contrarian | Hosted Ollama | `mistral-nemo:latest` | Contrarian    |
+| The Visionary  | Hosted Ollama | `llama3.1:8b`         | Visionary     |
+| Indic Voice    | Sarvam AI 🇮🇳  | `sarvam-m`            | Philosopher   |
+| The Pragmatist | Hosted Ollama | `mistral-nemo:latest` | Pragmatist 👑 |
+
+> No API keys. No credit card. Just sign in with Google and deliberate.
 
 ### All-Local (Ollama only)
 
@@ -279,50 +412,50 @@ ollama pull deepseek-v2        # Good for The Philosopher
 
 ### Raw Model Panel (compare models unfiltered)
 
-| Member  | Provider  | Model                     | Persona      |
-| ------- | --------- | ------------------------- | ------------ |
-| Model A | Anthropic | `claude-sonnet-4-6`       | Raw Model    |
-| Model B | Groq      | `llama-3.3-70b-versatile` | Raw Model    |
-| Model C | OpenAI    | `gpt-4o`                  | Raw Model    |
-| Model D | Google    | `gemini-2.0-flash`        | Raw Model 👑 |
+| Member  | Provider     | Model                     | Persona      |
+| ------- | ------------ | ------------------------- | ------------ |
+| Model A | Anthropic    | `claude-sonnet-4-6`       | Raw Model    |
+| Model B | Groq         | `llama-3.3-70b-versatile` | Raw Model    |
+| Model C | OpenAI       | `gpt-4o`                  | Raw Model    |
+| Model D | Sarvam AI 🇮🇳 | `sarvam-m`                | Raw Model 👑 |
 
 ---
 
 ## ✦ Council Templates
 
-Templates load a pre-built persona structure in one click. You still set provider, model, and API key per member after loading.
+Templates load a pre-built persona structure in one click. Set provider, model, and API key per member after loading.
 
 ### 🧠 Think Tank
 
-| Template                 | Members                                              | Best for                                      |
-| ------------------------ | ---------------------------------------------------- | --------------------------------------------- |
-| **📊 Business Strategy** | Analyst + Contrarian + Pragmatist 👑                 | Product, GTM, and operational decisions       |
-| **🧠 Deep Thinking**     | Philosopher + Visionary + Analyst + Pragmatist 👑    | Complex, nuanced, or philosophical questions  |
-| **⚖ Full Council**       | All 5 think-tank personas                            | Maximum deliberation depth                    |
-| **✨ Creative Council**  | Visionary + Philosopher + Contrarian + Pragmatist 👑 | Ideation, creative strategy, design decisions |
+| Template                 | Members                                              | Best for                                  |
+| ------------------------ | ---------------------------------------------------- | ----------------------------------------- |
+| **📊 Business Strategy** | Analyst + Contrarian + Pragmatist 👑                 | Product, GTM, and operational decisions   |
+| **🧠 Deep Thinking**     | Philosopher + Visionary + Analyst + Pragmatist 👑    | Complex, nuanced, philosophical questions |
+| **⚖ Full Council**       | All 5 think-tank personas                            | Maximum deliberation depth                |
+| **✨ Creative Council**  | Visionary + Philosopher + Contrarian + Pragmatist 👑 | Ideation, creative strategy, design       |
 
 ### 🏢 Corporate
 
-| Template               | Members                                                      | Best for                                          |
-| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------- |
-| **🚀 Product Launch**  | CFO + CTO + CMO + Legal Counsel + CEO 👑                     | Go/no-go launch decisions with departmental input |
-| **🌱 Startup Team**    | Founder + Engineer + Designer + Growth Lead + Investor 👑    | Early-stage product and strategy decisions        |
-| **💼 Consulting Firm** | Strategist + Operations + Finance + Risk + Senior Partner 👑 | Client-ready recommendations across workstreams   |
+| Template               | Members                                              | Best for                  |
+| ---------------------- | ---------------------------------------------------- | ------------------------- |
+| **🚀 Product Launch**  | CFO + CTO + CMO + Legal + CEO 👑                     | Go/no-go launch decisions |
+| **🌱 Startup Team**    | Founder + Engineer + Designer + Growth + Investor 👑 | Early-stage strategy      |
+| **💼 Consulting Firm** | Strategist + Ops + Finance + Risk + Partner 👑       | Client recommendations    |
 
 ### 🎯 Professional
 
-| Template              | Members                                                                           | Best for                                                |
-| --------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| **📰 Editorial Team** | Reporter + Editor + Legal Review + SEO + Editor-in-Chief 👑                       | Publishing decisions, story clearance, content strategy |
-| **🏥 Hospital Team**  | GP + Specialist + Pharmacist + Medical Ethicist + Chief of Medicine 👑            | Clinical questions, medical case analysis               |
-| **⚖️ Law Firm**       | Litigator + Corporate Counsel + Compliance + Junior Associate + Senior Partner 👑 | Legal risk assessment, deal review, compliance mapping  |
+| Template              | Members                                                     | Best for              |
+| --------------------- | ----------------------------------------------------------- | --------------------- |
+| **📰 Editorial Team** | Reporter + Editor + Legal + SEO + Editor-in-Chief 👑        | Publishing decisions  |
+| **🏥 Hospital Team**  | GP + Specialist + Pharmacist + Ethicist + Chief 👑          | Medical case analysis |
+| **⚖️ Law Firm**       | Litigator + Corporate + Compliance + Associate + Partner 👑 | Legal risk assessment |
 
 ### 🔬 Unfiltered
 
-| Template               | Members                                          | Best for                                                         |
-| ---------------------- | ------------------------------------------------ | ---------------------------------------------------------------- |
-| **🔬 Raw Model Panel** | 4× Raw Model (last one is Chairman)              | Comparing models on the same question with zero persona bias     |
-| **⚗️ Raw vs Persona**  | Raw Model + Analyst + Contrarian + Pragmatist 👑 | Seeing how persona framing changes output vs raw model reasoning |
+| Template               | Members                                    | Best for                            |
+| ---------------------- | ------------------------------------------ | ----------------------------------- |
+| **🔬 Raw Model Panel** | 4× Raw Model                               | Model comparison, zero persona bias |
+| **⚗️ Raw vs Persona**  | Raw + Analyst + Contrarian + Pragmatist 👑 | Persona framing vs raw reasoning    |
 
 ---
 
@@ -330,43 +463,43 @@ Templates load a pre-built persona structure in one click. You still set provide
 
 ### Think Tank (Original 5)
 
-| Persona             | Role                                      | Best for                                          |
-| ------------------- | ----------------------------------------- | ------------------------------------------------- |
-| **The Analyst**     | Structured, rigorous reasoning            | Questions needing step-by-step logic              |
-| **The Contrarian**  | Challenges assumptions, finds blind spots | Stress-testing ideas                              |
-| **The Visionary**   | Reframes from unexpected angles           | Creative and strategic questions                  |
-| **The Pragmatist**  | Focuses on execution and next steps       | Decisions needing action plans — best as Chairman |
-| **The Philosopher** | First principles, ethics, meaning         | Deep or value-laden questions                     |
+| Persona             | Role                                      | Best for                         |
+| ------------------- | ----------------------------------------- | -------------------------------- |
+| **The Analyst**     | Structured, rigorous reasoning            | Step-by-step logic               |
+| **The Contrarian**  | Challenges assumptions, finds blind spots | Stress-testing ideas             |
+| **The Visionary**   | Reframes from unexpected angles           | Creative and strategic questions |
+| **The Pragmatist**  | Focuses on execution and next steps       | Action plans — best as Chairman  |
+| **The Philosopher** | First principles, ethics, meaning         | Deep or value-laden questions    |
 
 ### Corporate / C-Suite
 
-| Persona                | Role                                                                     |
-| ---------------------- | ------------------------------------------------------------------------ |
-| **The CFO**            | Financial lens — ROI, unit economics, burn rate, margin analysis         |
-| **The CTO**            | Technical feasibility, architecture risk, engineering timelines          |
-| **The CMO**            | Market opportunity, positioning, go-to-market, demand generation         |
-| **The Legal Counsel**  | Regulatory risk, IP, liability, compliance frameworks                    |
-| **The CEO (Chairman)** | Final go/no-go — resolves departmental tensions with executive authority |
+| Persona                | Role                                                        |
+| ---------------------- | ----------------------------------------------------------- |
+| **The CFO**            | Financial lens — ROI, unit economics, burn rate             |
+| **The CTO**            | Technical feasibility, architecture risk                    |
+| **The CMO**            | Market opportunity, positioning, go-to-market               |
+| **The Legal Counsel**  | Regulatory risk, IP, liability                              |
+| **The CEO (Chairman)** | Final go/no-go — resolves tensions with executive authority |
 
 ### Startup Team
 
-| Persona                     | Role                                                                |
-| --------------------------- | ------------------------------------------------------------------- |
-| **The Founder**             | Vision, product-market fit, mission integrity                       |
-| **The Engineer**            | Production reality — what actually works at scale                   |
-| **The Designer**            | User voice — UX, simplicity, human-centered design                  |
-| **The Growth Lead**         | Acquisition, retention, viral loops, unit economics                 |
-| **The Investor (Chairman)** | Investment thesis — team, market, defensibility, capital efficiency |
+| Persona                     | Role                                                |
+| --------------------------- | --------------------------------------------------- |
+| **The Founder**             | Vision, product-market fit, mission integrity       |
+| **The Engineer**            | Production reality — what works at scale            |
+| **The Designer**            | User voice — UX, simplicity, human-centered design  |
+| **The Growth Lead**         | Acquisition, retention, viral loops, unit economics |
+| **The Investor (Chairman)** | Investment thesis — team, market, defensibility     |
 
 ### Consulting Firm
 
-| Persona                    | Role                                                              |
-| -------------------------- | ----------------------------------------------------------------- |
-| **The Strategist**         | Structured frameworks — Porter's, BCG, jobs-to-be-done            |
-| **The Operations Expert**  | Execution feasibility, critical path, implementation risk         |
-| **The Finance Expert**     | Financial modeling, unit economics, stress-testing                |
-| **The Risk Advisor**       | Risk matrix — strategic, operational, regulatory, black swans     |
-| **The Partner (Chairman)** | Synthesizes workstreams into a single client-ready recommendation |
+| Persona                    | Role                                                          |
+| -------------------------- | ------------------------------------------------------------- |
+| **The Strategist**         | Structured frameworks — Porter's, BCG, jobs-to-be-done        |
+| **The Operations Expert**  | Execution feasibility, critical path, implementation risk     |
+| **The Finance Expert**     | Financial modeling, unit economics, stress-testing            |
+| **The Risk Advisor**       | Risk matrix — strategic, operational, regulatory, black swans |
+| **The Partner (Chairman)** | Single client-ready recommendation across workstreams         |
 
 ### Editorial Team
 
@@ -380,66 +513,57 @@ Templates load a pre-built persona structure in one click. You still set provide
 
 ### Hospital Team
 
-| Persona                          | Role                                                               |
-| -------------------------------- | ------------------------------------------------------------------ |
-| **The GP**                       | Holistic assessment, first-line response, red flags                |
-| **The Specialist**               | Domain expertise, differential diagnosis, evidence-based treatment |
-| **The Pharmacist**               | Drug interactions, dosing, monitoring requirements                 |
-| **The Medical Ethicist**         | Autonomy, consent, beneficence, equity                             |
-| **Chief of Medicine (Chairman)** | Final clinical management plan, diagnosis, safety net              |
+| Persona                          | Role                                                |
+| -------------------------------- | --------------------------------------------------- |
+| **The GP**                       | Holistic assessment, first-line response, red flags |
+| **The Specialist**               | Domain expertise, differential diagnosis            |
+| **The Pharmacist**               | Drug interactions, dosing, monitoring               |
+| **The Medical Ethicist**         | Autonomy, consent, beneficence, equity              |
+| **Chief of Medicine (Chairman)** | Final clinical management plan                      |
 
 ### Law Firm
 
-| Persona                           | Role                                                                       |
-| --------------------------------- | -------------------------------------------------------------------------- |
-| **The Litigator**                 | Claims, defenses, litigation risk, settlement dynamics                     |
-| **The Corporate Lawyer**          | Entity structure, contracts, governance, M&A                               |
-| **The Compliance Officer**        | Regulatory mapping — GDPR, FCPA, employment law, sanctions                 |
-| **The Junior Associate**          | Detail-level review — ambiguous clauses, missed deadlines                  |
-| **The Senior Partner (Chairman)** | The firm's definitive legal position — frank, precise, strategically sound |
+| Persona                           | Role                                                      |
+| --------------------------------- | --------------------------------------------------------- |
+| **The Litigator**                 | Claims, defenses, litigation risk, settlement             |
+| **The Corporate Lawyer**          | Entity structure, contracts, governance, M&A              |
+| **The Compliance Officer**        | GDPR, FCPA, employment law, sanctions                     |
+| **The Junior Associate**          | Detail-level review — ambiguous clauses, missed deadlines |
+| **The Senior Partner (Chairman)** | The firm's definitive legal position                      |
 
 ### Unfiltered
 
-| Persona       | Role                                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------------------------- |
-| **Raw Model** | No persona, no role, no framing. The model answers from its own knowledge and judgment — pure signal. |
-| **Custom ✎**  | Define your own system prompt — any domain, any role.                                                 |
-
-> **When to use Raw Model:** Factual questions, technical comparisons, anything where you want to know what the model actually thinks rather than what a persona would say. Pair multiple Raw Model members across different providers to see where models genuinely agree or diverge.
+| Persona       | Role                                          |
+| ------------- | --------------------------------------------- |
+| **Raw Model** | No persona, no framing — pure model output    |
+| **Custom ✎**  | Your own system prompt — any domain, any role |
 
 ---
 
 ## ✦ The Chairman
 
-The Chairman receives the full deliberation transcript (all responses + all peer reviews) and produces a single authoritative verdict. Mandate:
+Receives the full transcript (all responses + reviews) and delivers one authoritative verdict. Mandate:
 
 - Extract the **strongest** insights from each member
-- **Resolve** disagreements — do not average them
+- **Resolve** disagreements — not average them
 - Eliminate redundancy and weak reasoning
 - Deliver a direct, unambiguous final answer
-
-The Pragmatist / CEO / Senior Partner personas are auto-suggested for Chairman because synthesis is fundamentally about decision-making, not description. The Raw Model persona can also serve as Chairman for unfiltered synthesis.
 
 ---
 
 ## ✦ Import / Export Council JSON
 
-Save your council setup and reload it later — useful for switching between different council configurations without reconfiguring from scratch.
+**Export:** Click **📤 Export Config**. Downloads `ai-council-config.json`. API keys are never included.
 
-**Export:** Click **📤 Export Config** on the setup screen. Downloads `ai-council-config.json`. API keys are never included.
-
-**Import:** Click **📥 Import JSON** and select a previously exported file. The council loads immediately — set provider/model/keys for each member.
-
-Example JSON format:
+**Import:** Click **📥 Import JSON** → select a file. Council loads immediately.
 
 ```json
 {
   "members": [
     {
       "name": "The Analyst",
-      "provider": "ollama",
-      "model": "deepseek-r1:latest",
-      "endpoint": "http://localhost:11434",
+      "provider": "managed_sarvam",
+      "model": "sarvam-m",
       "personaLabel": "The Analyst",
       "systemPrompt": "...",
       "isChairman": false
@@ -452,9 +576,7 @@ Example JSON format:
 
 ## ✦ Webhook Output
 
-Go to **⚙ Settings** in the deliberation header to configure a webhook URL.
-
-After every completed session, AI Council POSTs:
+Configure a URL in **⚙ Settings**. After every session, AI Council POSTs:
 
 ```json
 {
@@ -469,18 +591,13 @@ After every completed session, AI Council POSTs:
 }
 ```
 
-Works with Zapier, Make, n8n, Slack, Notion, Pipedream, or any HTTP endpoint. Use **🧪 Send Test Ping** to verify your URL before running a session.
+Works with Zapier, Make, n8n, Slack, Notion, Pipedream. Use **🧪 Send Test Ping** to verify first.
 
 ---
 
 ## ✦ Think Block Stripping
 
-Reasoning models like `deepseek-r1` and `qwq` emit `<think>...</think>` blocks before the actual answer. AI Council strips these automatically:
-
-- Fully closed `<think>...</think>` blocks are removed entirely
-- An unclosed `<think>` (model still reasoning mid-stream) shows a `🧠 Thinking deeply…` indicator
-- Stored text contains only the actual answer
-- Peer review and Chairman synthesis prompts only receive cleaned answers — no thinking noise leaks between stages
+Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Council strips these automatically and shows a `🧠 Thinking deeply…` indicator mid-stream. Peer review and Chairman prompts only receive the cleaned output — no thinking noise leaks between stages.
 
 ---
 
@@ -494,11 +611,12 @@ Reasoning models like `deepseek-r1` and `qwq` emit `<think>...</think>` blocks b
 
 ## ✦ Privacy & Data
 
-- **No backend.** All API calls go directly from your browser to the provider.
-- **No telemetry.** Nothing is tracked or sent anywhere.
-- **Local storage only.** Saved configs and session history live in your browser's persistent storage.
-- **API keys** are stored locally in the browser if you choose to save them. They are never included in JSON exports and never sent anywhere except the provider you configure.
-- **Webhook** is opt-in and user-configured — nothing is sent without you setting a URL.
+- **Managed providers (Sarvam AI, Hosted Ollama):** Requests are proxied through the AI Council backend. Provider, model, stage, and character counts are logged for usage analytics. Raw prompt text is not stored server-side.
+- **Self-hosted providers:** All API calls go directly from your browser to the provider. Nothing passes through our backend.
+- **Cloud configs:** API keys are AES-GCM encrypted in your browser before upload. The server only stores ciphertext.
+- **Local storage:** Session history and configs for anonymous users stay in your browser only.
+- **API keys** are never included in JSON exports.
+- **Webhook** is opt-in — nothing is sent without you setting a URL.
 
 ---
 
@@ -507,16 +625,21 @@ Reasoning models like `deepseek-r1` and `qwq` emit `<think>...</think>` blocks b
 - Ollama models run **sequentially** (one at a time per endpoint) — cloud models run in parallel
 - No markdown rendering in responses — plain text only (`pre-wrap`)
 - Session history is capped at the last 30 sessions
-- PDF export uses browser print — for rich formatting, use Markdown export and render separately
+- PDF export uses browser print — use Markdown export for richer formatting
+- Managed providers require a signed-in Google account
 
 ---
 
 ## ✦ Roadmap
 
 - [ ] Markdown rendering in response panels
-- [ ] Web search injection (Brave Search API) for grounding answers in current data
-- [ ] Token usage / cost tracking per session for cloud providers
-- [ ] Named council presets — save full council with provider + model assignments, not just personas
+- [ ] Web search injection for grounding answers in current data
+- [ ] Token usage / cost tracking per session
+- [ ] Named council presets — save full council with provider + model assignments
+- [ ] WhatsApp Integration — chat with your AI persona on WhatsApp directly
+- [ ] Voice Mode — speak to your persona, hear responses back
+- [ ] Document Council — upload a PDF and let the council analyse it
+- [ ] Public Persona Gallery — publish and browse community-created personas
 
 ---
 
@@ -528,6 +651,8 @@ MIT — do whatever you want with it.
 
 <div align="center">
 
-_Built with React. Runs entirely in your browser. No servers harmed._
+🇮🇳 **Built with pride in Bharat · Powered by [Sarvam AI](https://sarvam.ai)**
+
+_The council is always in session._
 
 </div>

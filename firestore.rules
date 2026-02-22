@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users can only read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Saved configs — fully owned by the user, encrypted client-side
+      match /configs/{configId} {
+        allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Usage events — users can read their own, only Functions can write
+    match /usage/{docId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false; // only Cloud Functions write here
+    }
+
+    // Sessions — users read their own only
+    match /sessions/{sessionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+
+    // Admin analytics — only admin UIDs (set in Functions env)
+    match /admin/{doc} {
+      allow read, write: if false; // Functions only
+    }
+  }
+}

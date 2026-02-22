@@ -74,7 +74,13 @@
 
     <!-- ── Favicon ───────────────────────────────────────────── -->
     <link rel="icon" type="image/png" href="/logo.png" />
+
+    <!-- ── PWA ──────────────────────────────────────────────── -->
+    <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/logo.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="AI Council" />
 
     <!-- ── Theme color (browser chrome on mobile) ───────────── -->
     <meta name="theme-color" content="#06060d" />
@@ -88,5 +94,30 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- ── Service Worker registration ──────────────────────── -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        // In dev (Vite), the SW must NOT run — it intercepts /@vite/ and
+        // WebSocket HMR requests, causing blank page on soft refresh.
+        const isDev = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+        if (isDev) {
+          // Unregister any previously installed SW so stale caches don't linger
+          navigator.serviceWorker.getRegistrations().then((regs) => {
+            regs.forEach((reg) => {
+              reg.unregister();
+              console.log("[PWA] SW unregistered in dev mode");
+            });
+          });
+        } else {
+          window.addEventListener("load", () => {
+            navigator.serviceWorker
+              .register("/sw.js")
+              .then((reg) => console.log("[PWA] SW registered:", reg.scope))
+              .catch((err) => console.warn("[PWA] SW registration failed:", err));
+          });
+        }
+      }
+    </script>
   </body>
 </html>

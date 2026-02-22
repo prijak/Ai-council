@@ -1242,8 +1242,58 @@ export function ResultsView({
         )}
       </div>
 
+      {/* ── Made in Bharat footer strip ── */}
+      {isDone && (
+        <div
+          style={{
+            borderTop: `1px solid rgba(249,115,22,0.12)`,
+            padding: "8px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background:
+              "linear-gradient(90deg, rgba(249,115,22,0.04), transparent, rgba(167,139,250,0.04))",
+            flexShrink: 0,
+            flexWrap: "wrap",
+            gap: 6,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 13 }}>🇮🇳</span>
+            <span
+              style={{
+                fontSize: 11,
+                color: "rgba(249,115,22,0.5)",
+                fontWeight: 600,
+              }}
+            >
+              Built with ❤️ in Bharat
+            </span>
+            {sessionMembers.some((m) => m.provider === "managed_sarvam") && (
+              <span
+                style={{
+                  fontSize: 10,
+                  padding: "1px 8px",
+                  borderRadius: 20,
+                  background: "rgba(249,115,22,0.1)",
+                  border: "1px solid rgba(249,115,22,0.25)",
+                  color: "#f97316",
+                }}
+              >
+                🇮🇳 Powered by Sarvam AI
+              </span>
+            )}
+          </div>
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.12)" }}>
+            AI Council · Multi-Model Deliberation
+          </span>
+        </div>
+      )}
+
       {/* Responsive CSS injected into head */}
       <style>{`
+        @keyframes shimmerSetup { 0% { background-position:-200% center; } 100% { background-position:200% center; } }
+        @keyframes floatBadge { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-3px); } }
         @media (max-width: 600px) {
           .desktop-sidebar { display: none !important; }
           .mobile-strip-opinions { display: block !important; }
