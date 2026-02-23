@@ -64,40 +64,4 @@ node_modules/
 
 # dotenv environment variables file
 .env
-
-
-# ── Environment variables (only .env is there, need the rest) ──
-.env.local
-.env.development
-.env.development.local
-.env.production
-.env.production.local
-.env.test.local
-
-# ── Vite build output ─────────────────────────────────────────
-dist/
-dist-ssr/
-
-# ── Firebase Admin / Service Account (critical for your server.js) ──
-*service-account*.json
-*serviceAccount*.json
-*firebase-adminsdk*.json
-credentials.json
-
-# ── OS files ──────────────────────────────────────────────────
-.DS_Store
-Thumbs.db
-
-# ── Editor ────────────────────────────────────────────────────
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# ── Sensitive keys / certs ────────────────────────────────────
-*.pem
-*.key
-*.cert
-
-# ── Vite specific ─────────────────────────────────────────────
-vite.config.js.timestamp-*
+backend/package-lock.json

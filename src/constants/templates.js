@@ -1,5 +1,5 @@
 export const COUNCIL_TEMPLATES = [
-  /* ── Original Templates ── */
+  /* ── Original Think-Tank ── */
   {
     id: "strategy",
     name: "Business Strategy",
@@ -57,7 +57,109 @@ export const COUNCIL_TEMPLATES = [
     ],
   },
 
-  /* ── Professional Templates ── */
+  /* ── AI Agent Style Templates (from system prompt leaks) ── */
+  {
+    id: "operator_research",
+    name: "Research + Operator",
+    icon: "🔬",
+    color: "#f472b6",
+    category: "ai-agents",
+    description: "Deep Researcher digs in. Web Intelligence tracks current state. Operator delivers the clean takeaway. Red Team stress-tests it.",
+    members: [
+      { personaId: "perplexity_researcher", name: "Deep Researcher", isChairman: false },
+      { personaId: "gpt_search", name: "Web Intelligence", isChairman: false },
+      { personaId: "red_team", name: "Red Team", isChairman: false },
+      { personaId: "operator_mode", name: "The Operator", isChairman: true },
+    ],
+  },
+  {
+    id: "ai_debate",
+    name: "AI Model Debate",
+    icon: "⚗️",
+    color: "#a78bfa",
+    category: "ai-agents",
+    description: "Grok's irreverence vs Claude Ethics vs Gemini Synthesis vs Canvas Writer. Raw Arbiter decides.",
+    members: [
+      { personaId: "xai_grok", name: "Grok (Irreverent)", isChairman: false },
+      { personaId: "claude_safety", name: "Claude (Ethics)", isChairman: false },
+      { personaId: "gemini_synthesizer", name: "Gemini (Synthesis)", isChairman: false },
+      { personaId: "canvas_writer", name: "Canvas (Writing)", isChairman: false },
+      { personaId: "raw", name: "Raw Arbiter", isChairman: true },
+    ],
+  },
+  {
+    id: "agentic_taskforce",
+    name: "Agentic Task Force",
+    icon: "⚡",
+    color: "#34d399",
+    category: "ai-agents",
+    description: "Task Planner + Full-Stack Builder + Risk Monitor. Workflow Orchestrator executes.",
+    members: [
+      { personaId: "pico_planner", name: "Task Planner", isChairman: false },
+      { personaId: "pico_fullstack", name: "Full-Stack Builder", isChairman: false },
+      { personaId: "pico_monitor", name: "Risk Monitor", isChairman: false },
+      { personaId: "workflow_orchestrator", name: "Orchestrator", isChairman: true },
+    ],
+  },
+  {
+    id: "skill_pipeline",
+    name: "Skill Pipeline",
+    icon: "🔀",
+    color: "#22d3ee",
+    category: "ai-agents",
+    description: "Skill Composer designs modular capabilities. Code Architect implements. Systems Thinker integrates. Executor delivers.",
+    members: [
+      { personaId: "skill_composer", name: "Skill Composer", isChairman: false },
+      { personaId: "cursor_engineer", name: "Code Architect", isChairman: false },
+      { personaId: "notion_strategist", name: "Systems Thinker", isChairman: false },
+      { personaId: "devin_executor", name: "Executor", isChairman: true },
+    ],
+  },
+  {
+    id: "socratic_red_team",
+    name: "Socratic + Red Team",
+    icon: "🦉",
+    color: "#f59e0b",
+    category: "ai-agents",
+    description: "Socratic Tutor questions assumptions. Red Team exploits vulnerabilities. Ethics Auditor guards principles. Systems Thinker synthesizes.",
+    members: [
+      { personaId: "socratic_tutor", name: "Socratic Tutor", isChairman: false },
+      { personaId: "red_team", name: "Red Team", isChairman: false },
+      { personaId: "claude_safety", name: "Ethics Auditor", isChairman: false },
+      { personaId: "notion_strategist", name: "Systems Thinker", isChairman: true },
+    ],
+  },
+  {
+    id: "india_council",
+    name: "India Intelligence Council",
+    icon: "🇮🇳",
+    color: "#f97316",
+    category: "ai-agents",
+    description: "Sarvam India + Sarvam Indic + Analyst + Pragmatist for India-specific strategy.",
+    members: [
+      { personaId: "sarvam_hindi", name: "Market Intelligence", isChairman: false },
+      { personaId: "sarvam_indic", name: "Cultural Lens", isChairman: false },
+      { personaId: "analyst", name: "The Analyst", isChairman: false },
+      { personaId: "pragmatist", name: "The Pragmatist", isChairman: true },
+    ],
+  },
+  {
+    id: "tech_ethics",
+    name: "Tech Ethics Review",
+    icon: "🛡️",
+    color: "#22d3ee",
+    category: "ai-agents",
+    description: "Code Architect + Ethics Auditor + Risk Monitor + Red Team. Systems Thinker chairs.",
+    members: [
+      { personaId: "cursor_engineer", name: "Code Architect", isChairman: false },
+      { personaId: "claude_safety", name: "Ethics Auditor", isChairman: false },
+      { personaId: "pico_monitor", name: "Risk Monitor", isChairman: false },
+      { personaId: "red_team", name: "Red Team", isChairman: false },
+      { personaId: "notion_strategist", name: "Systems Thinker", isChairman: true },
+    ],
+  },
+
+  /* ── Corporate ── */
   {
     id: "product_launch",
     name: "Product Launch",
@@ -103,6 +205,8 @@ export const COUNCIL_TEMPLATES = [
       { personaId: "partner", name: "Senior Partner", isChairman: true },
     ],
   },
+
+  /* ── Professional ── */
   {
     id: "editorial",
     name: "Editorial Team",
@@ -149,14 +253,14 @@ export const COUNCIL_TEMPLATES = [
     ],
   },
 
-  /* ── Raw Model Templates ── */
+  /* ── Unfiltered ── */
   {
     id: "raw_panel",
     name: "Raw Model Panel",
     icon: "🔬",
     color: "#94a3b8",
     category: "unfiltered",
-    description: "Multiple models answer without any persona — pure knowledge, pure reasoning. Best for factual, technical, or comparative questions.",
+    description: "Multiple models answer without any persona — pure knowledge, pure reasoning.",
     members: [
       { personaId: "raw", name: "Model A", isChairman: false },
       { personaId: "raw", name: "Model B", isChairman: false },
@@ -170,7 +274,7 @@ export const COUNCIL_TEMPLATES = [
     icon: "⚗️",
     color: "#a3e635",
     category: "unfiltered",
-    description: "One raw model alongside analyst, contrarian, and pragmatist — see how a persona-free voice changes the deliberation.",
+    description: "One raw model alongside analyst, contrarian, and pragmatist.",
     members: [
       { personaId: "raw", name: "The Model", isChairman: false },
       { personaId: "analyst", name: "The Analyst", isChairman: false },
@@ -182,6 +286,7 @@ export const COUNCIL_TEMPLATES = [
 
 export const TEMPLATE_CATEGORIES = [
   { id: "think-tank", label: "Think Tank", icon: "🧠" },
+  { id: "ai-agents", label: "AI Agents", icon: "🤖" },
   { id: "corporate", label: "Corporate", icon: "🏢" },
   { id: "professional", label: "Professional", icon: "🎯" },
   { id: "unfiltered", label: "Unfiltered", icon: "🔬" },

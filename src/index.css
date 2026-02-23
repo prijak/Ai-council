@@ -166,4 +166,107 @@ select option {
 @keyframes shimmer {
   0%   { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
+}/* ═══════════════════════════════════════════════════════
+   AI COUNCIL — MOBILE RESPONSIVE ADDITIONS
+   Append this to the bottom of index.css
+═══════════════════════════════════════════════════════ */
+
+/* ── DeliberationScreen header: reduce crowding on small screens ── */
+@media (max-width: 520px) {
+  /* Hide member avatar row in header — saves ~120px */
+  .header-avatars {
+    display: none !important;
+  }
+
+  /* Strip text labels from icon+text buttons, keep just the icon */
+  .btn-label {
+    display: none !important;
+  }
+
+  /* Tighten header button padding */
+  .header-btn {
+    padding: 5px 7px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Extra tight: hide secondary header actions at very small widths */
+@media (max-width: 380px) {
+  /* On tiny phones, hide settings button — accessible via manage */
+  .header-settings-btn {
+    display: none !important;
+  }
+}
+
+/* ── SetupScreen: make template grid single column on mobile ── */
+@media (max-width: 520px) {
+  .template-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Reduce section header padding */
+  .setup-header-right {
+    gap: 6px !important;
+  }
+}
+
+/* ── ManagePanel: full-screen on mobile ── */
+@media (max-width: 480px) {
+  .manage-panel {
+    width: 100vw !important;
+    border-left: none !important;
+  }
+}
+
+/* ── HistoryModal: full-screen on mobile ── */
+@media (max-width: 600px) {
+  .history-modal {
+    width: 100vw !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* ── General: better tap target sizing for all small buttons ── */
+@media (max-width: 480px) {
+  button {
+    min-height: 36px;
+  }
+
+  /* Prevent text overflow in MemberCard on narrow screens */
+  .member-card-model {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* ── Safe area helpers ── */
+.input-bar-safe {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+/* ── Prevent body scroll when a panel/modal is open ── */
+body.panel-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* ── AgentScreen: ensure the fixed container uses dvh correctly ── */
+.agent-root {
+  /* Fallback chain for maximum browser compat */
+  height: 100vh;
+  height: 100dvh;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #050508;
+}
+
+/* ── Fix Syne font not loading for textarea on some Android ── */
+textarea {
+  font-family: 'Syne', 'DM Sans', sans-serif !important;
 }

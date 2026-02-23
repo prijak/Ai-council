@@ -12,594 +12,800 @@ const AuthCtx = createContext(null);
 export const useAuth = () => useContext(AuthCtx);
 
 // ── Login Screen ──────────────────────────────────────────────────────────────
-function LoginScreen({ onSkip, onShowTerms }) {
+function LoginScreen({ onSkip, onShowTerms, compact = false }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [hoveredFeature, setHoveredFeature] = useState(null);
 
   const handleSignIn = async () => {
     setLoading(true);
     setError(null);
     try {
       await signInWithGoogle();
-      // On localhost: page navigates away immediately, nothing below runs.
-      // On production: popup resolves, onUserChange fires, component unmounts.
     } catch (e) {
-      // Only show error for real failures, not user-closed-popup
       if (
         e.code !== "auth/popup-closed-by-user" &&
         e.code !== "auth/cancelled-popup-request"
       ) {
         setError(e.message);
       }
-      setLoading(false); // only reset on error / cancelled
+      setLoading(false);
     }
   };
 
-  const features = [
+  const FEATURES = [
     {
-      icon: "🇮🇳",
-      label: "Sarvam AI",
-      sub: "India's own LLM — built with pride",
-      color: "#f97316",
-      glow: "rgba(249,115,22,0.3)",
-    },
-    {
-      icon: "🦙",
-      label: "Hosted Ollama",
-      sub: "Open-source models, zero setup",
-      color: "#34d399",
-      glow: "rgba(52,211,153,0.3)",
-    },
-    {
+      id: "council",
       icon: "⚖",
-      label: "3-Stage Deliberation",
-      sub: "Opinion → Peer review → Verdict",
+      title: "Council",
+      sub: "Multi-model deliberation",
       color: "#a78bfa",
-      glow: "rgba(167,139,250,0.3)",
+      desc: "Independent opinions → peer review → final verdict.",
     },
     {
-      icon: "◈",
-      label: "Multi-Provider",
-      sub: "OpenAI, Anthropic, Groq, Google",
-      color: "#60a5fa",
-      glow: "rgba(96,165,250,0.3)",
-    },
-    {
-      icon: "🔗",
-      label: "Follow-ups",
-      sub: "Chain questions with full context",
-      color: "#f59e0b",
-      glow: "rgba(245,158,11,0.3)",
-    },
-    {
-      icon: "📤",
-      label: "Export",
-      sub: "Markdown, PDF, Webhook",
+      id: "agent",
+      icon: "🤝",
+      title: "Agent Chat",
+      sub: "40+ expert personas",
       color: "#f472b6",
-      glow: "rgba(244,114,182,0.3)",
+      desc: "CEO, Philosopher, Life Coach, Indian Founder.",
+      badge: "FREE",
+    },
+    {
+      id: "voice",
+      icon: "🎙",
+      title: "Voice AI",
+      sub: "Hindi, Tamil & 10+ langs",
+      color: "#c084fc",
+      desc: "Speak naturally. AI that gets your accent.",
+      badge: "🇮🇳 NEW",
+    },
+    {
+      id: "whatsapp",
+      icon: "💬",
+      title: "WhatsApp AI",
+      sub: "Your AI on WhatsApp",
+      color: "#25d366",
+      desc: "No new apps. AI persona in the app you use.",
+      badge: "NEW",
     },
   ];
 
+  // ── Compact (modal) mode ──────────────────────────────────────────────────
+  if (compact) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+        {error && (
+          <div
+            style={{
+              padding: "10px 13px",
+              borderRadius: 9,
+              background: "rgba(248,113,113,0.08)",
+              border: "1px solid rgba(248,113,113,0.25)",
+              color: "#fca5a5",
+              fontSize: 13,
+              marginBottom: 12,
+            }}
+          >
+            ⚠ {error}
+          </div>
+        )}
+        <button
+          onClick={handleSignIn}
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "13px",
+            borderRadius: 12,
+            border: "none",
+            background: loading ? "rgba(255,255,255,0.06)" : "#fff",
+            color: loading ? "#888" : "#1a1a2e",
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: loading ? "wait" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            boxShadow: loading ? "none" : "0 4px 24px rgba(255,255,255,0.1)",
+            transition: "transform 0.15s, box-shadow 0.15s",
+            marginBottom: 10,
+            fontFamily: "inherit",
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.transform = "scale(1.02)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          {loading ? (
+            <>
+              <SpinRing /> Signing in…
+            </>
+          ) : (
+            <>
+              <GoogleLogo /> Continue with Google
+            </>
+          )}
+        </button>
+        <button
+          onClick={onSkip}
+          style={{
+            width: "100%",
+            padding: "11px",
+            borderRadius: 10,
+            border: "1px solid rgba(255,255,255,0.07)",
+            background: "transparent",
+            color: "#4a3f6a",
+            cursor: "pointer",
+            fontSize: 13,
+            transition: "all 0.15s",
+            fontFamily: "inherit",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#c4b5fd";
+            e.currentTarget.style.borderColor = "rgba(167,139,250,0.25)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#4a3f6a";
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
+          }}
+        >
+          🔑 Use my own API keys (no sign-in)
+        </button>
+        <p
+          style={{
+            fontSize: 11,
+            color: "#2e2a42",
+            textAlign: "center",
+            lineHeight: 1.7,
+            margin: "10px 0 0",
+          }}
+        >
+          By continuing you agree to our{" "}
+          <button
+            onClick={onShowTerms}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              color: "#5a4e8a",
+              cursor: "pointer",
+              fontSize: 11,
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#a78bfa")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#5a4e8a")}
+          >
+            Terms &amp; Conditions
+          </button>
+        </p>
+      </div>
+    );
+  }
+
+  // ── Full-page login ──────────────────────────────────────────────────────
   return (
     <div
       style={{
         minHeight: "100dvh",
-        background:
-          "radial-gradient(ellipse at 20% 10%, rgba(249,115,22,0.12) 0%, transparent 40%), radial-gradient(ellipse at 80% 80%, rgba(167,139,250,0.15) 0%, transparent 45%), radial-gradient(ellipse at 60% 30%, rgba(96,165,250,0.08) 0%, transparent 40%), #050508",
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "32px 16px",
+        background: "#060609",
         fontFamily: "'DM Sans', system-ui, sans-serif",
-        overflowX: "hidden",
+        overflow: "hidden",
       }}
     >
-      {/* Floating ambient orbs */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+        @keyframes spin       { to { transform: rotate(360deg); } }
+        @keyframes slideDown  { from { opacity:0; transform:translateY(-8px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes slideUp    { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes fadeIn     { from { opacity:0 } to { opacity:1 } }
+        @keyframes fadeUp     { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes shimmer    { 0%{background-position:-300% center} 100%{background-position:300% center} }
+        @keyframes orb1       { 0%,100%{transform:translate(0,0) scale(1)} 40%{transform:translate(50px,-40px) scale(1.08)} 70%{transform:translate(-25px,20px) scale(0.96)} }
+        @keyframes orb2       { 0%,100%{transform:translate(0,0) scale(1)} 35%{transform:translate(-60px,30px) scale(1.06)} 65%{transform:translate(35px,-20px) scale(1.02)} }
+        .login-card:hover { transform:translateY(-3px)!important; border-color:var(--card-c)!important; box-shadow:0 16px 48px rgba(0,0,0,0.4)!important; }
+        .login-card { transition: all 0.2s cubic-bezier(0.34,1.4,0.64,1)!important; }
+        @media(max-width:860px){ .login-split-right{ display:none!important; } .login-split-left{ max-width:100%!important; padding:36px 24px!important; } }
+      `}</style>
+
+      {/* Ambient orbs */}
       <div
         style={{
           position: "fixed",
           inset: 0,
           pointerEvents: "none",
-          overflow: "hidden",
           zIndex: 0,
+          overflow: "hidden",
         }}
       >
         <div
           style={{
             position: "absolute",
-            top: "8%",
-            left: "12%",
-            width: 200,
-            height: 200,
-            borderRadius: "50%",
+            width: "55vw",
+            height: "55vw",
+            maxWidth: 640,
+            maxHeight: 640,
             background:
-              "radial-gradient(circle, rgba(249,115,22,0.07), transparent 70%)",
-            animation: "loginPulse 6s ease-in-out infinite",
+              "radial-gradient(circle,rgba(249,115,22,0.08) 0%,transparent 65%)",
+            top: "-12%",
+            left: "-8%",
+            animation: "orb1 22s ease-in-out infinite",
           }}
         />
         <div
           style={{
             position: "absolute",
-            bottom: "15%",
-            right: "8%",
-            width: 260,
-            height: 260,
-            borderRadius: "50%",
+            width: "45vw",
+            height: "45vw",
+            maxWidth: 520,
+            maxHeight: 520,
             background:
-              "radial-gradient(circle, rgba(167,139,250,0.07), transparent 70%)",
-            animation: "loginPulse 8s ease-in-out infinite 2s",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: "45%",
-            right: "18%",
-            width: 130,
-            height: 130,
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(96,165,250,0.06), transparent 70%)",
-            animation: "loginPulse 5s ease-in-out infinite 1s",
+              "radial-gradient(circle,rgba(167,139,250,0.07) 0%,transparent 65%)",
+            bottom: "-10%",
+            right: "-6%",
+            animation: "orb2 26s ease-in-out infinite",
           }}
         />
       </div>
 
-      <style>{`
-        @keyframes loginPulse   { 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.15);opacity:1} }
-        @keyframes loginFloat   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes loginShimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
-        @keyframes spin         { to{transform:rotate(360deg)} }
-        @keyframes fadeIn       { from{opacity:0} to{opacity:1} }
-        @keyframes slideDown    { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
-      `}</style>
-
+      {/* ── Left — auth panel ── */}
       <div
+        className="login-split-left"
         style={{
           position: "relative",
           zIndex: 1,
-          width: "min(500px, 100%)",
+          width: "min(460px,100%)",
+          flexShrink: 0,
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          gap: 28,
+          justifyContent: "center",
+          padding: "52px 48px",
+          minHeight: "100dvh",
+          borderRight: "1px solid rgba(255,255,255,0.05)",
+          background: "rgba(5,5,11,0.85)",
+          backdropFilter: "blur(24px)",
         }}
       >
-        {/* Hero */}
-        <div style={{ textAlign: "center", animation: "slideDown 0.5s ease" }}>
-          <div
-            style={{
-              position: "relative",
-              display: "inline-block",
-              marginBottom: 20,
-            }}
-          >
-            <div
-              style={{
-                width: 84,
-                height: 84,
-                borderRadius: 24,
-                background:
-                  "linear-gradient(135deg, #f97316 0%, #a78bfa 55%, #60a5fa 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 40,
-                margin: "0 auto",
-                boxShadow:
-                  "0 0 0 1px rgba(255,255,255,0.1), 0 24px 64px rgba(167,139,250,0.35), 0 0 80px rgba(249,115,22,0.2)",
-                animation: "loginFloat 4s ease-in-out infinite",
-              }}
-            >
-              ⚖
-            </div>
-            <div
-              style={{
-                position: "absolute",
-                bottom: -8,
-                right: -12,
-                fontSize: 24,
-                filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.6))",
-              }}
-            >
-              🇮🇳
-            </div>
-          </div>
-          <h1
-            style={{
-              fontSize: 42,
-              fontWeight: 900,
-              color: "#fff",
-              letterSpacing: -2,
-              margin: "0 0 6px",
-              lineHeight: 1,
-            }}
-          >
-            AI Council
-          </h1>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: 3.5,
-              background:
-                "linear-gradient(90deg, #f97316, #a78bfa, #60a5fa, #f97316)",
-              backgroundSize: "200% auto",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              animation: "loginShimmer 4s linear infinite",
-              marginBottom: 16,
-              textTransform: "uppercase",
-            }}
-          >
-            Multi-Model Deliberation
-          </div>
-          <p
-            style={{
-              color: "#7a6f9a",
-              fontSize: 14,
-              lineHeight: 1.7,
-              margin: 0,
-              maxWidth: 360,
-              marginInline: "auto",
-            }}
-          >
-            Assemble a council of AI minds. They debate, challenge each other,
-            and synthesize the truth — powered partly by{" "}
-            <strong style={{ color: "#fb923c" }}>India's own Sarvam AI</strong>.
-          </p>
-        </div>
-
-        {/* Sarvam spotlight banner */}
+        {/* Logo — exact match to Shell.jsx sidebar logo */}
         <div
           style={{
-            width: "100%",
-            padding: "14px 18px",
-            borderRadius: 16,
-            background:
-              "linear-gradient(135deg, rgba(249,115,22,0.12), rgba(249,115,22,0.04))",
-            border: "1px solid rgba(249,115,22,0.3)",
             display: "flex",
             alignItems: "center",
-            gap: 14,
-            animation: "slideDown 0.55s ease 0.05s both",
+            gap: 12,
+            marginBottom: 40,
+            animation: "fadeUp 0.4s ease both",
           }}
         >
           <div
             style={{
-              width: 48,
-              height: 48,
-              borderRadius: 13,
+              width: 40,
+              height: 40,
+              borderRadius: 11,
               flexShrink: 0,
-              background:
-                "linear-gradient(135deg, rgba(249,115,22,0.22), rgba(249,115,22,0.08))",
-              border: "1px solid rgba(249,115,22,0.4)",
+              background: "linear-gradient(135deg,#f97316,#a78bfa,#60a5fa)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 26,
+              fontSize: 19,
+              boxShadow: "0 4px 18px rgba(249,115,22,0.3)",
             }}
           >
-            🇮🇳
+            ✦
           </div>
-          <div style={{ flex: 1 }}>
+          <div>
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 3,
+                fontFamily: "'Syne',sans-serif",
+                fontSize: 17,
+                fontWeight: 800,
+                color: "#fff",
+                letterSpacing: -0.3,
               }}
             >
-              <span style={{ fontSize: 14, fontWeight: 800, color: "#fb923c" }}>
-                Powered by Sarvam AI
-              </span>
-              <span
-                style={{
-                  fontSize: 10,
-                  padding: "1px 8px",
-                  borderRadius: 20,
-                  background: "rgba(249,115,22,0.15)",
-                  border: "1px solid rgba(249,115,22,0.35)",
-                  color: "#f97316",
-                  fontWeight: 700,
-                }}
-              >
-                🔥 NEW
-              </span>
+              AI Studio
             </div>
-            <p
+            <div
               style={{
-                fontSize: 12,
+                fontSize: 9,
                 color: "rgba(249,115,22,0.6)",
-                margin: 0,
-                lineHeight: 1.5,
+                fontWeight: 600,
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                marginTop: 1,
               }}
             >
-              India's own large language model — built with ❤️ in Bharat. Sign
-              in to use it free, no API key needed.
-            </p>
+              Bharat · Sarvam AI
+            </div>
           </div>
         </div>
 
-        {/* Feature grid */}
+        {/* Headline */}
         <div
-          style={{
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 8,
-            animation: "slideDown 0.55s ease 0.1s both",
-          }}
+          style={{ marginBottom: 28, animation: "fadeUp 0.4s 0.07s ease both" }}
         >
-          {features.map((f, i) => (
-            <div
-              key={f.label}
-              onMouseEnter={() => setHoveredFeature(i)}
-              onMouseLeave={() => setHoveredFeature(null)}
+          <h1
+            style={{
+              fontFamily: "'Syne',sans-serif",
+              fontSize: "clamp(28px,4vw,38px)",
+              fontWeight: 800,
+              color: "#fff",
+              letterSpacing: -0.8,
+              lineHeight: 1.1,
+              margin: "0 0 10px",
+            }}
+          >
+            Think. Talk.{" "}
+            <span
               style={{
-                padding: "12px 12px 10px",
-                borderRadius: 12,
                 background:
-                  hoveredFeature === i
-                    ? `${f.color}12`
-                    : "rgba(255,255,255,0.025)",
-                border: `1px solid ${hoveredFeature === i ? f.color + "55" : "rgba(255,255,255,0.07)"}`,
-                transition: "all 0.18s",
-                cursor: "default",
-                boxShadow: hoveredFeature === i ? `0 0 20px ${f.glow}` : "none",
+                  "linear-gradient(110deg,#f97316 0%,#a78bfa 40%,#60a5fa 65%,#25d366 100%)",
+                backgroundSize: "300% auto",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                animation: "shimmer 7s linear infinite",
               }}
             >
-              <div style={{ fontSize: 20, marginBottom: 5 }}>{f.icon}</div>
+              Connect.
+            </span>
+          </h1>
+          <p
+            style={{
+              fontSize: 14,
+              color: "rgba(255,255,255,0.38)",
+              lineHeight: 1.65,
+              margin: 0,
+              maxWidth: 340,
+            }}
+          >
+            India's AI platform — council deliberations, expert conversations,
+            voice in your language, and WhatsApp AI.
+          </p>
+        </div>
+
+        {/* Made in Bharat pill */}
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 7,
+            padding: "5px 12px",
+            borderRadius: 100,
+            background: "rgba(249,115,22,0.08)",
+            border: "1px solid rgba(249,115,22,0.18)",
+            marginBottom: 28,
+            animation: "fadeUp 0.4s 0.12s ease both",
+            alignSelf: "flex-start",
+          }}
+        >
+          <span>🇮🇳</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "#fb923c" }}>
+            Made in Bharat · Powered by Sarvam AI
+          </span>
+          <span
+            style={{
+              fontSize: 9,
+              padding: "1px 7px",
+              borderRadius: 20,
+              background: "rgba(249,115,22,0.18)",
+              color: "#f97316",
+              fontWeight: 800,
+            }}
+          >
+            FREE
+          </span>
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div
+            style={{
+              padding: "10px 13px",
+              borderRadius: 9,
+              background: "rgba(248,113,113,0.08)",
+              border: "1px solid rgba(248,113,113,0.22)",
+              color: "#fca5a5",
+              fontSize: 13,
+              marginBottom: 16,
+            }}
+          >
+            ⚠ {error}
+          </div>
+        )}
+
+        {/* Google sign-in */}
+        <button
+          onClick={handleSignIn}
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "14px",
+            borderRadius: 12,
+            border: "none",
+            background: loading ? "rgba(255,255,255,0.06)" : "#fff",
+            color: loading ? "#888" : "#1a1a2e",
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: loading ? "wait" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            boxShadow: loading ? "none" : "0 4px 28px rgba(255,255,255,0.12)",
+            transition: "transform 0.15s, box-shadow 0.15s",
+            fontFamily: "inherit",
+            marginBottom: 10,
+            animation: "fadeUp 0.4s 0.16s ease both",
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 8px 36px rgba(255,255,255,0.2)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "";
+            e.currentTarget.style.boxShadow =
+              "0 4px 28px rgba(255,255,255,0.12)";
+          }}
+        >
+          {loading ? (
+            <>
+              <SpinRing /> Signing in…
+            </>
+          ) : (
+            <>
+              <GoogleLogo /> Continue with Google
+            </>
+          )}
+        </button>
+
+        {/* Sign-in perks */}
+        <div
+          style={{
+            display: "flex",
+            gap: 6,
+            flexWrap: "wrap",
+            marginBottom: 16,
+            animation: "fadeUp 0.4s 0.18s ease both",
+          }}
+        >
+          {[
+            ["🧠", "#25d366", "WhatsApp AI"],
+            ["🎙️", "#c084fc", "Voice Chat"],
+            ["🇮🇳", "#f97316", "Sarvam AI"],
+            ["🔒", "#a78bfa", "Encrypted"],
+          ].map(([icon, color, label]) => (
+            <span
+              key={label}
+              style={{
+                fontSize: 10,
+                padding: "3px 9px",
+                borderRadius: 20,
+                background: `${color}12`,
+                border: `1px solid ${color}28`,
+                color,
+              }}
+            >
+              {icon} {label}
+            </span>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 10,
+            animation: "fadeUp 0.4s 0.2s ease both",
+          }}
+        >
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.05)" }}
+          />
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.2)" }}>
+            or explore without signing in
+          </span>
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.05)" }}
+          />
+        </div>
+
+        {/* Skip / own keys */}
+        <button
+          onClick={onSkip}
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: 11,
+            border: "1px solid rgba(255,255,255,0.07)",
+            background: "transparent",
+            color: "rgba(255,255,255,0.28)",
+            cursor: "pointer",
+            fontSize: 13,
+            transition: "all 0.15s",
+            fontFamily: "inherit",
+            animation: "fadeUp 0.4s 0.22s ease both",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#c4b5fd";
+            e.currentTarget.style.borderColor = "rgba(167,139,250,0.25)";
+            e.currentTarget.style.background = "rgba(167,139,250,0.05)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "rgba(255,255,255,0.28)";
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
+            e.currentTarget.style.background = "transparent";
+          }}
+        >
+          🔑 Use my own API keys (no sign-in)
+        </button>
+
+        {/* Terms */}
+        <p
+          style={{
+            fontSize: 10,
+            color: "rgba(255,255,255,0.14)",
+            textAlign: "center",
+            lineHeight: 1.7,
+            margin: "16px 0 0",
+            animation: "fadeUp 0.4s 0.24s ease both",
+          }}
+        >
+          By continuing, you agree to our{" "}
+          <button
+            onClick={onShowTerms}
+            style={{
+              background: "none",
+              border: "none",
+              padding: 0,
+              color: "rgba(167,139,250,0.45)",
+              cursor: "pointer",
+              fontSize: 10,
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+              fontFamily: "inherit",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#a78bfa")}
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.color = "rgba(167,139,250,0.45)")
+            }
+          >
+            Terms &amp; Conditions
+          </button>
+        </p>
+      </div>
+
+      {/* ── Right — feature showcase ── */}
+      <div
+        className="login-split-right"
+        style={{
+          flex: 1,
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "52px 56px",
+        }}
+      >
+        {/* Section label */}
+        <div
+          style={{
+            fontSize: 9,
+            color: "rgba(255,255,255,0.2)",
+            letterSpacing: 1.8,
+            fontWeight: 700,
+            textTransform: "uppercase",
+            marginBottom: 18,
+            animation: "fadeUp 0.4s 0.1s ease both",
+          }}
+        >
+          Platform
+        </div>
+
+        {/* Feature cards — match HomePage.jsx style */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2,1fr)",
+            gap: 12,
+            marginBottom: 32,
+            animation: "fadeUp 0.4s 0.14s ease both",
+          }}
+        >
+          {FEATURES.map((f, i) => (
+            <div
+              key={f.id}
+              className="login-card"
+              style={{
+                "--card-c": f.color,
+                padding: "18px 18px 16px",
+                borderRadius: 16,
+                background: `linear-gradient(145deg,${f.color}10,${f.color}04)`,
+                border: `1px solid ${f.color}1e`,
+                position: "relative",
+                overflow: "hidden",
+                animationDelay: `${0.16 + i * 0.06}s`,
+              }}
+            >
               <div
                 style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: hoveredFeature === i ? f.color : "#b8a9e8",
-                  marginBottom: 2,
-                  transition: "color 0.18s",
-                  lineHeight: 1.3,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background: `linear-gradient(90deg,transparent,${f.color}55,transparent)`,
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  marginBottom: 11,
                 }}
               >
-                {f.label}
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 11,
+                    background: `${f.color}16`,
+                    border: `1.5px solid ${f.color}32`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 20,
+                  }}
+                >
+                  {f.icon}
+                </div>
+                {f.badge && (
+                  <span
+                    style={{
+                      fontSize: 9,
+                      padding: "2px 8px",
+                      borderRadius: 20,
+                      background: `${f.color}18`,
+                      border: `1px solid ${f.color}33`,
+                      color: f.color,
+                      fontWeight: 800,
+                    }}
+                  >
+                    {f.badge}
+                  </span>
+                )}
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Syne',sans-serif",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: "#fff",
+                  marginBottom: 2,
+                }}
+              >
+                {f.title}
               </div>
               <div
                 style={{
                   fontSize: 10,
-                  color: "rgba(255,255,255,0.28)",
-                  lineHeight: 1.35,
+                  color: f.color,
+                  fontWeight: 600,
+                  marginBottom: 6,
                 }}
               >
                 {f.sub}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "rgba(255,255,255,0.36)",
+                  lineHeight: 1.6,
+                }}
+              >
+                {f.desc}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Auth card */}
+        {/* Stats strip — match HomePage.jsx */}
         <div
           style={{
-            width: "100%",
-            padding: "22px",
-            borderRadius: 20,
-            border: "1px solid rgba(255,255,255,0.09)",
-            background: "rgba(255,255,255,0.025)",
-            backdropFilter: "blur(20px)",
             display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            animation: "slideDown 0.55s ease 0.15s both",
+            gap: 0,
+            padding: "14px 20px",
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.05)",
+            animation: "fadeUp 0.4s 0.42s ease both",
           }}
         >
-          {error && (
+          {[
+            { v: "40+", l: "Personas", c: "#f472b6" },
+            { v: "10+", l: "Languages", c: "#c084fc" },
+            { v: "6+", l: "Providers", c: "#60a5fa" },
+            { v: "Free", l: "with login", c: "#34d399" },
+          ].map((s, i) => (
             <div
+              key={s.l}
               style={{
-                padding: "10px 13px",
-                borderRadius: 9,
-                background: "rgba(248,113,113,0.08)",
-                border: "1px solid rgba(248,113,113,0.25)",
-                color: "#fca5a5",
-                fontSize: 13,
+                flex: "1 1 80px",
+                textAlign: "center",
+                borderLeft: i > 0 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                padding: "4px 12px",
               }}
             >
-              ⚠ {error}
-            </div>
-          )}
-
-          <button
-            onClick={handleSignIn}
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "14px",
-              borderRadius: 12,
-              border: "none",
-              background: loading ? "rgba(255,255,255,0.06)" : "#fff",
-              color: loading ? "#888" : "#1a1a2e",
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: loading ? "wait" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              transition: "transform 0.15s, box-shadow 0.15s",
-              boxShadow: loading ? "none" : "0 4px 24px rgba(255,255,255,0.1)",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.transform = "scale(1.02)";
-                e.currentTarget.style.boxShadow =
-                  "0 6px 32px rgba(255,255,255,0.18)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow =
-                "0 4px 24px rgba(255,255,255,0.1)";
-            }}
-          >
-            {loading ? (
-              <>
-                <SpinRing /> Signing in…
-              </>
-            ) : (
-              <>
-                <GoogleLogo /> Continue with Google
-              </>
-            )}
-          </button>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              ["🇮🇳", "#f97316", "Sarvam AI"],
-              ["🦙", "#34d399", "Hosted Ollama"],
-              ["☁", "#60a5fa", "Cloud configs"],
-              ["🔒", "#a78bfa", "Encrypted keys"],
-            ].map(([icon, color, label]) => (
-              <span
-                key={label}
+              <div
                 style={{
-                  fontSize: 10,
-                  padding: "3px 9px",
-                  borderRadius: 20,
-                  background: `${color}12`,
-                  border: `1px solid ${color}28`,
-                  color,
+                  fontFamily: "'Syne',sans-serif",
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: s.c,
+                  lineHeight: 1,
                 }}
               >
-                {icon} {label}
-              </span>
-            ))}
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div
-              style={{
-                flex: 1,
-                height: 1,
-                background: "rgba(255,255,255,0.06)",
-              }}
-            />
-            <span style={{ fontSize: 11, color: "#383058" }}>
-              or explore without signing in
-            </span>
-            <div
-              style={{
-                flex: 1,
-                height: 1,
-                background: "rgba(255,255,255,0.06)",
-              }}
-            />
-          </div>
-
-          <button
-            onClick={onSkip}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: 11,
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "transparent",
-              color: "#524870",
-              cursor: "pointer",
-              fontSize: 13,
-              transition: "all 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#c4b5fd";
-              e.currentTarget.style.borderColor = "rgba(167,139,250,0.3)";
-              e.currentTarget.style.background = "rgba(167,139,250,0.06)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#524870";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-              e.currentTarget.style.background = "transparent";
-            }}
-          >
-            🔑 Use my own API keys (no sign-in)
-          </button>
-
-          <p
-            style={{
-              fontSize: 11,
-              color: "#2e2a42",
-              textAlign: "center",
-              lineHeight: 1.7,
-              margin: 0,
-            }}
-          >
-            Your API keys are never stored on our servers. By continuing, you
-            agree to our{" "}
-            <button
-              onClick={onShowTerms}
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                color: "#5a4e8a",
-                cursor: "pointer",
-                fontSize: 11,
-                textDecoration: "underline",
-                textUnderlineOffset: 2,
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#a78bfa")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#5a4e8a")}
-            >
-              Terms &amp; Conditions
-            </button>
-          </p>
+                {s.v}
+              </div>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: "rgba(255,255,255,0.26)",
+                  marginTop: 4,
+                }}
+              >
+                {s.l}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Made in India footer */}
+        {/* Footer */}
         <div
           style={{
-            textAlign: "center",
-            paddingBottom: 8,
-            animation: "slideDown 0.55s ease 0.2s both",
+            marginTop: 28,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            animation: "fadeUp 0.4s 0.48s ease both",
           }}
         >
-          <div
+          <span style={{ fontSize: 14 }}>🇮🇳</span>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.18)" }}>
+            Built with ❤️ in
+          </span>
+          <span
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "8px 18px",
-              borderRadius: 24,
-              background: "rgba(249,115,22,0.06)",
-              border: "1px solid rgba(249,115,22,0.15)",
+              fontSize: 12,
+              fontWeight: 800,
+              background:
+                "linear-gradient(90deg,#f97316 0%,#fff 50%,#138808 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}
           >
-            <span style={{ fontSize: 16 }}>🇮🇳</span>
-            <span style={{ fontSize: 12, color: "#7a6a50" }}>Built with</span>
-            <span style={{ fontSize: 14 }}>❤️</span>
-            <span style={{ fontSize: 12, color: "#7a6a50" }}>in</span>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 800,
-                background:
-                  "linear-gradient(90deg, #f97316 0%, #ffffff 50%, #138808 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Bharat
-            </span>
-          </div>
-          <div style={{ fontSize: 11, color: "#2a2035", marginTop: 8 }}>
-            Proudly using Sarvam AI — India's own LLM 🚀
-          </div>
+            Bharat
+          </span>
+          <span
+            style={{
+              marginLeft: "auto",
+              fontSize: 10,
+              color: "rgba(255,255,255,0.12)",
+            }}
+          >
+            Proudly using Sarvam AI 🚀
+          </span>
         </div>
       </div>
     </div>
@@ -903,7 +1109,7 @@ function TermsModal({ onClose }) {
 }
 
 // ── UserAvatar ────────────────────────────────────────────────────────────────
-export function UserAvatar() {
+export function UserAvatar({ dropUp = false }) {
   const { user, isAnonymous } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -998,8 +1204,19 @@ export function UserAvatar() {
           <div
             style={{
               position: "absolute",
-              top: "calc(100% + 8px)",
-              right: 0,
+              ...(dropUp
+                ? {
+                    bottom: "calc(100% + 8px)",
+                    top: "auto",
+                    left: 0,
+                    right: "auto",
+                  }
+                : {
+                    top: "calc(100% + 8px)",
+                    bottom: "auto",
+                    right: 0,
+                    left: "auto",
+                  }),
               width: 220,
               zIndex: 50,
               background: "#0e0e1a",
@@ -1007,7 +1224,7 @@ export function UserAvatar() {
               borderRadius: 12,
               boxShadow: "0 20px 60px rgba(0,0,0,0.7)",
               overflow: "hidden",
-              animation: "slideDown 0.15s ease",
+              animation: "slideUp 0.15s ease",
             }}
           >
             <div
@@ -1230,6 +1447,7 @@ export function AuthGate({ children }) {
   const [isAnonymous, setAnon] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [redirectDone, setRedirectDone] = useState(!isRedirectPending());
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     /**
@@ -1286,9 +1504,136 @@ export function AuthGate({ children }) {
     );
   }
 
+  const openLogin = () => setShowLoginModal(true);
+
   return (
-    <AuthCtx.Provider value={{ user, isAnonymous }}>
+    <AuthCtx.Provider value={{ user, isAnonymous, openLogin }}>
       {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
+
+      {/* Login modal — shown when a gated feature is clicked while anonymous */}
+      {showLoginModal && !user && (
+        <div
+          onClick={(e) =>
+            e.target === e.currentTarget && setShowLoginModal(false)
+          }
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 200,
+            background: "rgba(0,0,0,0.82)",
+            backdropFilter: "blur(10px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16,
+            animation: "fadeIn 0.18s ease",
+          }}
+        >
+          <div
+            style={{
+              width: "min(460px, 100%)",
+              background: "linear-gradient(160deg,#0d0d1c,#07070f)",
+              border: "1px solid rgba(167,139,250,0.25)",
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 40px 120px rgba(0,0,0,0.9)",
+              animation: "slideDown 0.2s ease",
+              position: "relative",
+            }}
+          >
+            {/* close X */}
+            <button
+              onClick={() => setShowLoginModal(false)}
+              style={{
+                position: "absolute",
+                top: 14,
+                right: 14,
+                zIndex: 10,
+                width: 30,
+                height: 30,
+                borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.04)",
+                color: "rgba(255,255,255,0.4)",
+                cursor: "pointer",
+                fontSize: 14,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ✕
+            </button>
+            <div style={{ padding: "28px 24px 24px", textAlign: "center" }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>🔐</div>
+              <div
+                style={{
+                  fontSize: 17,
+                  fontWeight: 800,
+                  color: "#fff",
+                  marginBottom: 6,
+                }}
+              >
+                Sign in to unlock this feature
+              </div>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#6b5f8a",
+                  lineHeight: 1.6,
+                  marginBottom: 20,
+                }}
+              >
+                Voice chat, WhatsApp assistant & persona chat require a free
+                account — no API key needed.
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                  marginBottom: 20,
+                }}
+              >
+                {[
+                  ["🧠", "#25d366", "WhatsApp AI"],
+                  ["🎙️", "#f472b6", "Voice Chat"],
+                  ["🎭", "#60a5fa", "Agent Chat"],
+                  ["🇮🇳", "#f97316", "Sarvam AI"],
+                ].map(([icon, color, label]) => (
+                  <span
+                    key={label}
+                    style={{
+                      fontSize: 11,
+                      padding: "3px 10px",
+                      borderRadius: 20,
+                      background: `${color}14`,
+                      border: `1px solid ${color}30`,
+                      color,
+                    }}
+                  >
+                    {icon} {label}
+                  </span>
+                ))}
+              </div>
+              <LoginScreen
+                onSkip={() => {
+                  setShowLoginModal(false);
+                  if (isAnonymous) {
+                  } else setAnon(true);
+                }}
+                onShowTerms={() => {
+                  setShowLoginModal(false);
+                  setShowTerms(true);
+                }}
+                compact
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {user || isAnonymous ? (
         children
       ) : (

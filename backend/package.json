@@ -10,6 +10,10 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "firebase-admin": "^12.0.0",
-    "node-fetch": "^3.3.2"
+    "form-data": "^4.0.5",
+    "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
+    "qrcode": "^1.5.4",
+    "whatsapp-web.js": "^1.34.6"
   }
 }

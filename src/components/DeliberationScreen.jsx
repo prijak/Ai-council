@@ -16,6 +16,7 @@ import { ManagePanel } from "./ManagePanel";
 import { HistoryModal } from "./HistoryModal";
 import { SettingsModal } from "./SettingsModal";
 import { ResultsView } from "./ResultsView";
+import { MCPPanel } from "./MCPPanel";
 
 export function DeliberationScreen({
   initialMembers,
@@ -39,6 +40,8 @@ export function DeliberationScreen({
   const [showManage, setManage] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showMCP, setShowMCP] = useState(false);
+  const [mcpConnections, setMcpConnections] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [thinkingMap, setThinkingMap] = useState({});
   const [followUpChain, setFollowUpChain] = useState([]);
@@ -352,6 +355,13 @@ export function DeliberationScreen({
         />
       )}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showMCP && (
+        <MCPPanel
+          connections={mcpConnections}
+          onClose={() => setShowMCP(false)}
+          onUpdate={setMcpConnections}
+        />
+      )}
 
       {/* Header */}
       <div
@@ -359,6 +369,8 @@ export function DeliberationScreen({
           ...layoutStyles.header,
           flexWrap: "nowrap",
           overflow: "hidden",
+          gap: 6,
+          padding: "7px 10px",
         }}
       >
         {/* Logo + title */}
@@ -366,7 +378,7 @@ export function DeliberationScreen({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 8,
+            gap: 7,
             flexShrink: 0,
           }}
         >
@@ -401,7 +413,7 @@ export function DeliberationScreen({
           <div>
             <div
               style={{
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: 800,
                 color: "#fff",
                 letterSpacing: -0.2,
@@ -410,13 +422,16 @@ export function DeliberationScreen({
             >
               AI Council
             </div>
+            {/* subtitle hidden on mobile */}
             <div
+              className="header-subtitle"
               style={{
-                fontSize: 8,
-                letterSpacing: 1.5,
-                color: "rgba(249,115,22,0.55)",
+                fontSize: 7.5,
+                letterSpacing: 1.4,
+                color: "rgba(249,115,22,0.5)",
                 fontWeight: 700,
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
               }}
             >
               Deliberation · Made in Bharat
@@ -424,86 +439,89 @@ export function DeliberationScreen({
           </div>
         </div>
 
-        {/* Right controls — scroll horizontally if needed */}
+        {/* Member avatars — centre, scrollable, shrinks away on tiny screens */}
+        <div
+          className="header-avatars"
+          style={{
+            display: "flex",
+            gap: 3,
+            overflowX: "auto",
+            scrollbarWidth: "none",
+            flex: 1,
+            justifyContent: "center",
+            padding: "0 2px",
+          }}
+        >
+          {liveMembers.slice(0, 6).map((m) => (
+            <div
+              key={m.id}
+              title={`${m.name} · ${PROVIDERS[m.provider].name}/${m.model}${liveChairId === m.id ? " · Chairman" : ""}`}
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 5,
+                background: `${m.color}1a`,
+                border: `1px solid ${m.color}${liveChairId === m.id ? "99" : "44"}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 11,
+                color: m.color,
+                flexShrink: 0,
+              }}
+            >
+              {m.icon}
+            </div>
+          ))}
+          {liveMembers.length > 6 && (
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 5,
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 9,
+                color: tokens.textMuted,
+                flexShrink: 0,
+              }}
+            >
+              +{liveMembers.length - 6}
+            </div>
+          )}
+        </div>
+
+        {/* Right controls — always icon-only, no text labels ever */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 5,
-            overflowX: "auto",
-            scrollbarWidth: "none",
-            flexShrink: 1,
-            justifyContent: "flex-end",
+            gap: 4,
+            flexShrink: 0,
           }}
         >
-          {/* Member avatars — hidden on very small screens via inline max-width cap */}
-          <div
-            style={{ display: "flex", gap: 3, flexShrink: 0 }}
-            className="header-avatars"
-          >
-            {liveMembers.slice(0, 5).map((m) => (
-              <div
-                key={m.id}
-                title={`${m.name} · ${PROVIDERS[m.provider].name}/${m.model}${liveChairId === m.id ? " · Chairman" : ""}`}
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: 5,
-                  background: `${m.color}1a`,
-                  border: `1px solid ${m.color}${liveChairId === m.id ? "99" : "44"}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 11,
-                  color: m.color,
-                  flexShrink: 0,
-                }}
-              >
-                {m.icon}
-              </div>
-            ))}
-            {liveMembers.length > 5 && (
-              <div
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: 5,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 9,
-                  color: tokens.textMuted,
-                  flexShrink: 0,
-                }}
-              >
-                +{liveMembers.length - 5}
-              </div>
-            )}
-          </div>
-
-          {/* Cancel button — always visible when running */}
           {isRunning && !cancelled && (
             <button
               onClick={doCancel}
               style={{
-                padding: "5px 10px",
+                padding: "4px 8px",
                 borderRadius: 6,
-                border: `1px solid rgba(248,113,113,0.4)`,
+                border: "1px solid rgba(248,113,113,0.4)",
                 background: "rgba(248,113,113,0.1)",
                 color: "#fca5a5",
                 cursor: "pointer",
-                fontSize: 12,
-                fontWeight: 600,
+                fontSize: 11,
+                fontWeight: 700,
                 display: "flex",
                 alignItems: "center",
                 gap: 4,
                 flexShrink: 0,
-                whiteSpace: "nowrap",
               }}
             >
-              <Spin size={9} color="#fca5a5" /> Cancel
+              <Spin size={8} color="#fca5a5" /> Stop
             </button>
           )}
 
@@ -519,81 +537,92 @@ export function DeliberationScreen({
             </span>
           )}
 
-          {/* Icon-only buttons (label hidden on mobile via CSS) */}
           <button
             onClick={() => setShowHistory(true)}
+            title={`History (${sessions.length})`}
             style={{
-              padding: "5px 9px",
-              borderRadius: 6,
-              border: `1px solid rgba(52,211,153,0.3)`,
-              background: "rgba(52,211,153,0.07)",
+              ...buttonStyles.iconSquare,
               color: "#6ee7b7",
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 600,
+              border: "1px solid rgba(52,211,153,0.25)",
+              background: "rgba(52,211,153,0.06)",
               flexShrink: 0,
-              whiteSpace: "nowrap",
+              position: "relative",
             }}
           >
             📋
-            <span className="btn-label">
-              {sessions.length > 0 ? ` (${sessions.length})` : ""}
-            </span>
+            {sessions.length > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -4,
+                  background: "#34d399",
+                  color: "#000",
+                  borderRadius: "50%",
+                  width: 13,
+                  height: 13,
+                  fontSize: 8,
+                  fontWeight: 800,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1.5px solid #06060d",
+                }}
+              >
+                {sessions.length > 9 ? "9+" : sessions.length}
+              </span>
+            )}
           </button>
+
           <button
             onClick={() => setManage(true)}
+            title="Manage Council"
             style={{
-              padding: "5px 9px",
-              borderRadius: 6,
-              border: `1px solid rgba(167,139,250,0.3)`,
-              background: "rgba(167,139,250,0.07)",
+              ...buttonStyles.iconSquare,
               color: "#c4b5fd",
-              cursor: "pointer",
-              fontSize: 12,
-              fontWeight: 600,
+              border: "1px solid rgba(167,139,250,0.25)",
+              background: "rgba(167,139,250,0.06)",
               flexShrink: 0,
-              whiteSpace: "nowrap",
             }}
           >
-            ⚙<span className="btn-label"> Manage</span>
+            ⚙
           </button>
+
           <button
             onClick={() => setShowSettings(true)}
+            title="Settings"
             style={{
               ...buttonStyles.iconSquare,
               color: tokens.textMuted,
               flexShrink: 0,
             }}
-            title="Settings"
           >
             ⚙︎
           </button>
+
           <button
             onClick={onReset}
+            title="Rebuild Council"
             style={{
-              ...buttonStyles.ghost,
-              padding: "5px 9px",
-              fontSize: 12,
+              ...buttonStyles.iconSquare,
+              color: tokens.textMuted,
               flexShrink: 0,
-              whiteSpace: "nowrap",
             }}
           >
-            ↩<span className="btn-label"> Rebuild</span>
+            ↩
           </button>
         </div>
       </div>
 
-      {/* Reconnecting banner — shown when app returns from background mid-stream */}
+      {/* Reconnecting banner */}
       <style>{`
-        @keyframes reconnect-pulse {
-          0%, 100% { opacity: 1; } 50% { opacity: 0.6; }
-        }
-        @media (max-width: 480px) {
+        @keyframes reconnect-pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        @media (max-width: 520px) {
           .header-avatars { display: none !important; }
-          .btn-label { display: none; }
+          .header-subtitle { display: none !important; }
         }
-        @media (max-width: 600px) {
-          .btn-label { display: none; }
+        @media (max-width: 680px) {
+          .header-subtitle { display: none !important; }
         }
       `}</style>
 
@@ -753,6 +782,170 @@ export function DeliberationScreen({
                 Convene →
               </button>
             </div>
+          </div>
+
+          {/* ── Feature pill bar ── */}
+          <div
+            style={{
+              display: "flex",
+              gap: 6,
+              flexWrap: "wrap",
+              alignItems: "center",
+              padding: "4px 2px",
+            }}
+          >
+            {/* Manage Council */}
+            <button
+              onClick={() => setManage(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "6px 12px",
+                borderRadius: 20,
+                border: "1px solid rgba(167,139,250,0.3)",
+                background: "rgba(167,139,250,0.07)",
+                color: "#c4b5fd",
+                cursor: "pointer",
+                fontSize: 12,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+              }}
+            >
+              ⚙ Manage Council
+            </button>
+
+            {/* History */}
+            <button
+              onClick={() => setShowHistory(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "6px 12px",
+                borderRadius: 20,
+                border: "1px solid rgba(52,211,153,0.25)",
+                background: "rgba(52,211,153,0.06)",
+                color: "#6ee7b7",
+                cursor: "pointer",
+                fontSize: 12,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                position: "relative",
+              }}
+            >
+              📋 History
+              {sessions.length > 0 && (
+                <span
+                  style={{
+                    background: "#34d399",
+                    color: "#000",
+                    borderRadius: 10,
+                    padding: "0 5px",
+                    fontSize: 9,
+                    fontWeight: 800,
+                    lineHeight: "15px",
+                  }}
+                >
+                  {sessions.length > 9 ? "9+" : sessions.length}
+                </span>
+              )}
+            </button>
+
+            {/* MCP Servers */}
+            <button
+              onClick={() => setShowMCP(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "6px 12px",
+                borderRadius: 20,
+                border:
+                  mcpConnections.length > 0
+                    ? "1px solid rgba(96,165,250,0.35)"
+                    : `1px solid ${tokens.borderSubtle}`,
+                background:
+                  mcpConnections.length > 0
+                    ? "rgba(96,165,250,0.07)"
+                    : "rgba(255,255,255,0.03)",
+                color: mcpConnections.length > 0 ? "#93c5fd" : tokens.textMuted,
+                cursor: "pointer",
+                fontSize: 12,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+              }}
+            >
+              🔌 MCP Servers
+              {mcpConnections.length > 0 && (
+                <span
+                  style={{
+                    background: "#60a5fa",
+                    color: "#000",
+                    borderRadius: 10,
+                    padding: "0 5px",
+                    fontSize: 9,
+                    fontWeight: 800,
+                    lineHeight: "15px",
+                  }}
+                >
+                  {mcpConnections.length}
+                </span>
+              )}
+            </button>
+
+            {/* Settings */}
+            <button
+              onClick={() => setShowSettings(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "6px 12px",
+                borderRadius: 20,
+                border: `1px solid ${tokens.borderSubtle}`,
+                background: "rgba(255,255,255,0.03)",
+                color: tokens.textMuted,
+                cursor: "pointer",
+                fontSize: 12,
+                whiteSpace: "nowrap",
+              }}
+            >
+              ⚙︎ Settings
+            </button>
+
+            {/* Rebuild */}
+            <button
+              onClick={onReset}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "6px 12px",
+                borderRadius: 20,
+                border: `1px solid ${tokens.borderSubtle}`,
+                background: "rgba(255,255,255,0.03)",
+                color: tokens.textMuted,
+                cursor: "pointer",
+                fontSize: 12,
+                whiteSpace: "nowrap",
+              }}
+            >
+              ↩ Rebuild
+            </button>
+
+            {/* Webhook status */}
+            {webhookStatus && (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: webhookStatus.ok ? tokens.success : "#fca5a5",
+                  marginLeft: "auto",
+                }}
+              >
+                {webhookStatus.ok ? "🔗 Webhook ✓" : "🔗 Webhook ✗"}
+              </span>
+            )}
           </div>
         </div>
       )}

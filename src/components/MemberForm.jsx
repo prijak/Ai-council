@@ -9,6 +9,7 @@ import { useAuth } from "./AuthGate";
 import { uid } from "../lib/utils";
 import { Spin, Toggle } from "./atoms";
 import { ModelPicker } from "./ModelPicker";
+import { PersonaPicker } from "./PersonaPicker";
 import { SavedConfigCard, SaveConfigRow } from "./SavedConfig";
 import { SystemPromptEditor } from "./SystemPromptEditor";
 
@@ -22,12 +23,32 @@ export function MemberForm({
   const isEdit = !!editMember;
   const { user, isAnonymous } = useAuth();
   const isCloud = !!(user && !isAnonymous);
-  const [prov, setProv] = useState(editMember?.provider || "ollama");
+
+  // Only show providers the current user is allowed to use
+  const availableProviders = Object.entries(PROVIDERS).filter(
+    ([, p]) => isCloud || !p.requiresAuth,
+  );
+
+  // Ensure default provider is always one the user can access
+  const defaultProvider =
+    editMember?.provider || (isCloud ? "managed_sarvam" : "ollama");
+
+  // Auto-set model for single-model providers (e.g. sarvam-m for managed_sarvam)
+  const defaultModel = (() => {
+    if (editMember?.model) return editMember.model;
+    const provInfo = PROVIDERS[defaultProvider];
+    if (!provInfo?.canFetchModels && provInfo?.suggestedModels?.length === 1) {
+      return provInfo.suggestedModels[0];
+    }
+    return "";
+  })();
+
+  const [prov, setProv] = useState(defaultProvider);
   const [endpoint, setEndpoint] = useState(
-    editMember?.endpoint || "http://localhost:11434",
+    editMember?.endpoint || PROVIDERS[defaultProvider]?.defaultEndpoint || "",
   );
   const [apiKey, setApiKey] = useState(editMember?.apiKey || "");
-  const [model, setModel] = useState(editMember?.model || "");
+  const [model, setModel] = useState(defaultModel);
   const [name, setName] = useState(editMember?.name || "");
   const [personaId, setPersonaId] = useState(
     editMember
@@ -75,7 +96,13 @@ export function MemberForm({
   const handleProvChange = (p) => {
     setProv(p);
     setEndpoint(PROVIDERS[p].defaultEndpoint || "");
-    setModel("");
+    // Auto-select model if provider only has one option
+    const info = PROVIDERS[p];
+    if (!info?.canFetchModels && info?.suggestedModels?.length === 1) {
+      setModel(info.suggestedModels[0]);
+    } else {
+      setModel("");
+    }
     setFetched([]);
     setFetchErr("");
   };
@@ -83,6 +110,9 @@ export function MemberForm({
   const handlePersonaChange = (pid) => {
     setPersonaId(pid);
     const p = PERSONAS.find((x) => x.id === pid);
+    if (!name.trim() && p && p.id !== "custom" && p.id !== "raw") {
+      setName(p.label);
+    }
     if (p?.chairSuggest && !currentChairmanId) {
       setIsChairman(true);
       setChairMsg(
@@ -145,7 +175,7 @@ export function MemberForm({
             ? customSys
             : personaObj.prompt,
       color: editMember?.color || color,
-      icon: editMember?.icon || icon,
+      icon: editMember?.icon || personaObj?.icon || icon,
       isChairman,
     });
   };
@@ -252,7 +282,7 @@ export function MemberForm({
             color: editMember?.color || color,
           }}
         >
-          {editMember?.icon || icon}
+          {personaObj?.icon || editMember?.icon || icon}
         </div>
         <span
           style={{ fontSize: 14, fontWeight: 600, color: tokens.textPrimary }}
@@ -261,33 +291,31 @@ export function MemberForm({
         </span>
       </div>
 
-      {/* Provider selector */}
+      {/* Provider selector — filtered by auth */}
       <div style={{ marginBottom: 18 }}>
         <label style={formStyles.label}>Provider</label>
         <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-          {Object.entries(PROVIDERS)
-            .filter(([, p]) => !p.managed || isCloud)
-            .map(([k, p]) => (
-              <button
-                key={k}
-                onClick={() => handleProvChange(k)}
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: 8,
-                  cursor: "pointer",
-                  fontSize: 12,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                  border: `1px solid ${prov === k ? p.color + "99" : tokens.borderSubtle}`,
-                  background: prov === k ? `${p.color}18` : "transparent",
-                  color: prov === k ? p.color : tokens.textMuted,
-                }}
-              >
-                <span>{p.icon}</span>
-                <span>{p.name}</span>
-              </button>
-            ))}
+          {availableProviders.map(([k, p]) => (
+            <button
+              key={k}
+              onClick={() => handleProvChange(k)}
+              style={{
+                padding: "6px 11px",
+                borderRadius: 7,
+                cursor: "pointer",
+                fontSize: 12,
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                border: `1px solid ${prov === k ? p.color + "99" : tokens.borderSubtle}`,
+                background: prov === k ? `${p.color}18` : "transparent",
+                color: prov === k ? p.color : tokens.textMuted,
+              }}
+            >
+              <span>{p.icon}</span>
+              <span>{p.name}</span>
+            </button>
+          ))}
         </div>
         {pInfo.hint && (
           <div
@@ -373,8 +401,8 @@ export function MemberForm({
         )}
       </div>
 
-      {/* Model — uses improved ModelPicker from v2 */}
-      <div style={{ marginBottom: 12 }}>
+      {/* Model */}
+      <div style={{ marginBottom: 16 }}>
         <label style={formStyles.label}>Model</label>
         <ModelPicker
           value={model}
@@ -398,44 +426,23 @@ export function MemberForm({
       </div>
 
       {/* Name + Persona */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 12,
-          marginBottom: 12,
-        }}
-      >
-        <div>
-          <label style={formStyles.label}>Display Name</label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Gemini Flash"
-            style={formStyles.input}
-          />
-        </div>
-        <div>
-          <label style={formStyles.label}>Persona</label>
-          <select
-            value={personaId}
-            onChange={(e) => handlePersonaChange(e.target.value)}
-            style={{ ...formStyles.input, cursor: "pointer" }}
-          >
-            {PERSONA_GROUPS.map((grp) => (
-              <optgroup key={grp.label} label={grp.label}>
-                {grp.ids.map((pid) => {
-                  const p = PERSONAS.find((x) => x.id === pid);
-                  return p ? (
-                    <option key={p.id} value={p.id}>
-                      {p.label}
-                    </option>
-                  ) : null;
-                })}
-              </optgroup>
-            ))}
-          </select>
-        </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={formStyles.label}>Display Name</label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Gemini Flash"
+          style={formStyles.input}
+        />
+      </div>
+
+      <div style={{ marginBottom: 12 }}>
+        <label style={formStyles.label}>Persona</label>
+        <PersonaPicker
+          value={personaId}
+          onChange={handlePersonaChange}
+          accentColor={editMember?.color || color}
+        />
       </div>
 
       {chairMsg && (

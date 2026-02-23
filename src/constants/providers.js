@@ -15,3 +15,13 @@ export const PROVIDERS = {
 
 export const ACCENT_COLORS = ["#a78bfa","#fb923c","#34d399","#60a5fa","#f59e0b","#f472b6","#22d3ee","#a3e635"];
 export const ACCENT_ICONS  = ["⚖","✦","⚡","◈","⚙","◎","❋","◆"];
+
+/**
+ * Returns only the providers available to the current user.
+ * Providers with requiresAuth: true are hidden from logged-out users.
+ */
+export function getAvailableProviders(isLoggedIn) {
+  return Object.fromEntries(
+    Object.entries(PROVIDERS).filter(([, p]) => isLoggedIn || !p.requiresAuth)
+  );
+}

@@ -1,15 +1,16 @@
 <div align="center">
 
 ```
-  ╔═══════════════════════════════════════════╗
-  ║                                           ║
-  ║    ⚖  A I   C O U N C I L  ⚖             ║
-  ║                                           ║
-  ║   Ask any question. Get answers from      ║
-  ║   multiple AI models. Let a Chairman      ║
-  ║   synthesize the verdict.                 ║
-  ║                                           ║
-  ╚═══════════════════════════════════════════╝
+  ╔═══════════════════════════════════════════════════╗
+  ║                                                   ║
+  ║    ✦  A I   S T U D I O  ✦  Bharat · Sarvam AI   ║
+  ║                                                   ║
+  ║   Think. Talk. Connect.                           ║
+  ║                                                   ║
+  ║   Multi-model Council · Agent Chat · Voice AI     ║
+  ║   WhatsApp Integration · 40+ Expert Personas      ║
+  ║                                                   ║
+  ╚═══════════════════════════════════════════════════╝
 ```
 
 ### 🇮🇳 Built with ❤️ in Bharat · Powered by Sarvam AI
@@ -31,9 +32,212 @@
 
 </div>
 
-## 🇮🇳 Sarvam AI — India's Own LLM, Built into AI Council
+## 📋 Changelog — Recent Updates
 
-[Sarvam AI](https://sarvam.ai) is an Indian large language model built for Bharat — designed to understand Indian context, culture, and languages. It is fully integrated into AI Council as a **first-class hosted provider**, available free to all signed-in users.
+> All changes shipped since the last README revision.
+
+### ✦ AI Studio — Full App Rebrand & Multi-Page Shell
+
+The app has evolved from a single-screen "AI Council" tool into a full **AI Studio** platform with persistent navigation and five distinct pages.
+
+- App renamed from **AI Council** → **AI Studio · Bharat · Sarvam AI**
+- New `Shell.jsx` — desktop sidebar (220px) + mobile top header + mobile bottom tab bar in one layout wrapper
+- New `design.js` — shared CSS keyframes, `NAV_ITEMS` constants, `ghostBtn()` and `alertBox()` utility helpers used across all pages
+- `SetupScreen.jsx` refactored into a thin router that delegates rendering to page-level components
+
+### ✦ Five-Page Navigation
+
+| Page           | Icon | Auth Required                             |
+| -------------- | ---- | ----------------------------------------- |
+| **Home**       | ⌂    | No                                        |
+| **Council**    | ⚖    | Optional (managed providers need sign-in) |
+| **Agent Chat** | 🤝   | Yes — shows inline sign-in wall           |
+| **Voice AI**   | 🎙   | Yes — triggers login modal on launch      |
+| **WhatsApp**   | 💬   | Yes — triggers login modal on launch      |
+
+### ✦ HomePage — New Landing Page
+
+Replaces the old empty default view:
+
+- Animated headline: **Think. Talk. Connect.** with multi-color gradient shimmer
+- Eyebrow badge: _Made in Bharat · Powered by Sarvam AI · 🔥 FREE_
+- Floating ambient background orbs (animated radial gradients)
+- 4-column feature card grid (Council, Agent Chat, Voice AI, WhatsApp) — each card navigates to its page
+- Stats strip: **40+ Personas · 10+ Languages · 6+ Providers · Free with login**
+
+### ✦ CouncilPage — Extracted Page Component
+
+Council builder is now `src/components/setup/pages/CouncilPage.jsx`:
+
+- Stage I / II / III summary cards shown at the top of the page
+- Two-column layout: members on the left, templates on the right
+- Category filter pills for templates (Think Tank, AI Agents, Corporate, Professional, Unfiltered)
+- Inline member editing — click ✎ to expand an edit form in-place, no panel required
+- Validation shows a list of incomplete members with inline **Edit →** shortcut buttons
+- Templates auto-select `managed_sarvam` when the user is signed in, `ollama` when not
+
+### ✦ AgentPage — Dedicated Agent Chat Page
+
+`src/components/setup/pages/AgentPage.jsx`:
+
+- Full persona grid with category filter pills at the top
+- Shows an inline **sign-in wall** (not a redirect) when logged out — feature preview chips visible
+- Custom personas surface in a "Mine" category automatically
+- **✨ Custom Persona** action button in the page header
+- Persona cards show name, tagline, badge, and a **Chat →** CTA
+
+### ✦ VoicePage & WhatsAppPage — New Platform Pages
+
+**VoicePage** (`pages/VoicePage.jsx`):
+
+- Hero section with a language pill strip (10+ Indic scripts rendered natively)
+- "Why it's different" feature grid: cultural context, real-time streaming, code-switching, all personas by voice
+- Auth-gated launch button → opens `SarvamVoiceChat` modal after sign-in
+
+**WhatsAppPage** (`pages/WhatsAppPage.jsx`):
+
+- "How it works" 4-step numbered flow with color-accent step markers
+- Use case grid: Morning Clarity, Deal Coach, Evening Debrief, Startup Advisor
+- Auth-gated launch button → opens `WhatsAppGateway` modal after sign-in
+
+### ✦ PageHeader — Shared Reusable Header Component
+
+`src/components/setup/PageHeader.jsx` used by all inner pages:
+
+- Color-matched icon box (background + border tinted to page accent color)
+- `clamp()`-scaled title in Syne font
+- Optional subtitle line
+- Optional `extra` prop — renders action buttons right-aligned (responsive wraps on mobile)
+
+### ✦ UserAvatar Dropdown — Direction & Positioning Fixes
+
+- Added `dropUp` boolean prop to `UserAvatar`
+- **Desktop sidebar** passes `dropUp` → dropdown opens **upward**, left-anchored, expands into main content area (not clipped by sidebar)
+- **Mobile header** omits `dropUp` → dropdown opens **downward**, right-anchored, stays within viewport
+- Removed the brittle CSS hack (`[style*="position: absolute"]` override) from `Shell.jsx`
+
+### ✦ PersonaPicker — New Searchable Grouped Dropdown
+
+Replaces the native `<select>` for persona selection in `MemberForm`:
+
+- Grouped by category with color-coded section headers
+- Category filter pills (All + each group)
+- Full-text search across persona name and system prompt text
+- Chair suggestion badge (`👑 CHAIR`) shown inline on eligible personas
+- 2-line prompt preview per row
+- Keyboard navigable (arrow keys, Enter, Escape)
+
+### ✦ ModelPicker — New Searchable Combobox
+
+Replaces `<input list="datalist">` for model selection:
+
+- Type to filter with live substring highlight of matching characters
+- Arrow-key navigation through list, Enter to confirm or use typed value
+- Quantization tag extracted from model name (`q4_K_M` etc.) shown as a dim pill
+- Integrated **↻ Fetch** button — fires `onFetchClick` prop to live-fetch models from the provider API
+- Clear (✕) and chevron (▲/▼) controls in the input row
+- Descriptive empty state: "No match — press Enter to use `{typed}`"
+
+### ✦ Agent Personas — Expanded to 40+
+
+`AgentScreen.jsx` now exports `AGENT_PERSONAS` and `AGENT_PERSONA_CATEGORIES`. Major additions:
+
+| Category            | New Personas                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| **Leadership**      | CEO, CFO, CTO, CMO, Startup Founder                                                 |
+| **Philosophy**      | Stoic, Existentialist, Buddhist, Socratic Tutor                                     |
+| **India**           | Indian Founder, Sarvam Hindi, Sarvam Indic, Market Intelligence, Cultural Lens      |
+| **AI Agents**       | Grok, Claude Ethics, Gemini Synthesizer, Devin Executor, Task Planner, Risk Monitor |
+| **Coaching**        | Life Coach, Therapist, Career Coach                                                 |
+| **Legal / Finance** | Lawyer, CA, SEBI Advisor                                                            |
+
+### ✦ Council Templates — AI Agents Category (7 New Templates)
+
+New `ai-agents` template category added to `templates.js`. Total templates: **18** (up from 13).
+
+| Template                          | Members                                                                        | Focus                   |
+| --------------------------------- | ------------------------------------------------------------------------------ | ----------------------- |
+| **🔬 Research + Operator**        | Deep Researcher + Web Intelligence + Red Team + Operator 👑                    | Research synthesis      |
+| **⚗️ AI Model Debate**            | Grok + Claude Ethics + Gemini + Canvas + Raw Arbiter 👑                        | Model comparison        |
+| **⚡ Agentic Task Force**         | Task Planner + Full-Stack Builder + Risk Monitor + Orchestrator 👑             | Execution pipelines     |
+| **🔀 Skill Pipeline**             | Skill Composer + Code Architect + Systems Thinker + Executor 👑                | Modular AI workflows    |
+| **🦉 Socratic + Red Team**        | Socratic Tutor + Red Team + Ethics Auditor + Systems Thinker 👑                | Critical reasoning      |
+| **🇮🇳 India Intelligence Council** | Market Intelligence + Cultural Lens + Analyst + Pragmatist 👑                  | India-specific strategy |
+| **🛡️ Tech Ethics Review**         | Code Architect + Ethics Auditor + Risk Monitor + Red Team + Systems Thinker 👑 | Responsible tech        |
+
+### ✦ SarvamVoiceChat Modal
+
+New component `SarvamVoiceChat.jsx` — full voice chat experience:
+
+- Persona and language selection before starting
+- Real-time voice-to-text via Sarvam AI's speech API
+- Streaming text response with voice playback
+- Supports Hindi, Tamil, Bengali, and 10+ Indic languages
+- Auth-gated — only accessible to signed-in users
+
+### ✦ WhatsAppGateway Modal
+
+New component `WhatsAppGateway.jsx` — WhatsApp linking flow:
+
+- QR code generation for WhatsApp Web pairing
+- Persona selection for the WhatsApp AI
+- Connection status tracking
+- Auth-gated — only accessible to signed-in users
+
+### ✦ MCPPanel — MCP Server Integration
+
+New component `MCPPanel.jsx`:
+
+- Configure Model Context Protocol server endpoints
+- Tool discovery and selection
+- Available as an advanced option in Council and Agent modes
+
+### ✦ `providers.js` — `getAvailableProviders()` Helper
+
+```js
+export function getAvailableProviders(isLoggedIn) {
+  return Object.fromEntries(
+    Object.entries(PROVIDERS).filter(([, p]) => isLoggedIn || !p.requiresAuth),
+  );
+}
+```
+
+Managed providers (`managed_sarvam`, `managed_ollama`) are filtered out of the provider picker when the user is not signed in. All components use this instead of `PROVIDERS` directly.
+
+### ✦ Auth-Gate Patterns
+
+Two distinct patterns are used depending on the feature:
+
+- **Soft gate (sign-in wall):** AgentPage renders an inline sign-in prompt instead of the persona grid. The user stays on the page and can see what they would get.
+- **Hard gate (login modal):** Voice and WhatsApp pages show their full marketing content freely, but calling `requireAuth()` on the launch button triggers `openLogin()` from `AuthGate` context — which opens the existing login modal overlay without a page change.
+
+### ✦ Project Structure Update
+
+```
+src/components/
+├── setup/
+│   ├── Shell.jsx              # NEW — sidebar + mobile nav layout wrapper
+│   ├── PageHeader.jsx         # NEW — shared page header component
+│   ├── design.js              # NEW — shared CSS, NAV_ITEMS, helpers
+│   └── pages/
+│       ├── HomePage.jsx       # NEW — landing page with hero + feature cards
+│       ├── CouncilPage.jsx    # NEW — council builder (extracted from SetupScreen)
+│       ├── AgentPage.jsx      # NEW — agent chat browse page
+│       ├── VoicePage.jsx      # NEW — voice AI marketing + launch page
+│       └── WhatsAppPage.jsx   # NEW — WhatsApp marketing + launch page
+├── MCPPanel.jsx               # NEW — MCP server integration
+├── SarvamVoiceChat.jsx        # NEW — voice chat modal
+├── WhatsAppGateway.jsx        # NEW — WhatsApp connection modal
+├── PersonaPicker.jsx          # NEW — searchable grouped persona dropdown
+├── ModelPicker.jsx            # NEW — searchable model combobox
+└── SetupScreen.jsx            # REFACTORED — now a thin 5-page router
+```
+
+---
+
+## 🇮🇳 Sarvam AI — India's Own LLM, Built into AI Studio
+
+[Sarvam AI](https://sarvam.ai) is an Indian large language model built for Bharat — designed to understand Indian context, culture, and languages. It is fully integrated into AI Studio as a **first-class hosted provider**, available free to all signed-in users.
 
 **Why Sarvam AI?**
 
@@ -41,11 +245,11 @@
 - Understands Indian cultural and business context natively
 - Supports Indic language inputs and multilingual reasoning
 - No API key required — sign in with Google and use it instantly
-- Available in both Council mode and Agent Chat mode
+- Available in Council mode, Agent Chat mode, and Voice AI mode
 
 **How to use it:**
 
-1. Click **Sign in with Google** (top right)
+1. Click **Sign in with Google** (top right or sidebar)
 2. Add a council member → select **Sarvam AI 🇮🇳** as the provider
 3. Model is pre-set to `sarvam-m` — no configuration needed
 4. Run your query — Sarvam AI deliberates alongside any other models you choose
@@ -96,7 +300,7 @@ Your Question
 
 - **Multi-provider** — Ollama, OpenAI, Groq, Anthropic, Google, **Sarvam AI 🇮🇳**, or any OpenAI-compatible endpoint
 - **Mix local + cloud** — run DeepSeek-R1 locally alongside Claude, GPT-4o, or Sarvam AI
-- **36 built-in personas** across Think Tank, Corporate, Startup, Consulting, Editorial, Medical, Legal, and Unfiltered roles
+- **40+ built-in personas** across Think Tank, Corporate, Startup, Consulting, Editorial, Medical, Legal, AI Agents, India, Philosophy, Coaching, and Unfiltered roles
 - **Raw Model persona** — no role-play, no framing: the model responds from its own knowledge and judgment
 - **Streaming responses** — watch all models think in real time, switch tabs mid-generation without losing data
 - **Think-block stripping** — `<think>` blocks from reasoning models (DeepSeek-R1, QwQ) are hidden; only the final answer is shown, with a live "🧠 Thinking…" indicator
@@ -105,9 +309,18 @@ Your Question
 - **Saved configs** — save provider + model + API key combos for quick reuse
 - **Mobile friendly** — responsive layout, no white flash, safe area insets, iOS zoom prevention
 
+### Platform Modes
+
+| Mode              | Description                                            | Auth     |
+| ----------------- | ------------------------------------------------------ | -------- |
+| **⚖ Council**     | 3-stage multi-model deliberation with Chairman verdict | Optional |
+| **🤝 Agent Chat** | 1-on-1 conversation with 40+ expert personas           | Required |
+| **🎙 Voice AI**   | Speak in Hindi, Tamil, and 10+ Indian languages        | Required |
+| **💬 WhatsApp**   | AI persona living inside WhatsApp                      | Required |
+
 ---
 
-## ✦ New Features
+## ✦ Auth & Cloud Features
 
 ### 🔐 Google Sign-In & Firebase Authentication
 
@@ -119,15 +332,13 @@ Sign in with your Google account to unlock cloud features and free hosted models
 
 ### ☁ Cloud Config Sync with End-to-End Encryption
 
-When signed in, your saved council configs sync to Firestore. API keys are encrypted with **AES-GCM 256-bit** (WebCrypto) before leaving your browser — the server only ever stores ciphertext.
+When signed in, saved council configs sync to Firestore. API keys are encrypted with **AES-GCM 256-bit** (WebCrypto) before leaving your browser — the server only ever stores ciphertext.
 
 - Configs sync across devices automatically
-- Each saved config card shows a `☁ cloud · 🔒 encrypted` badge when active
+- Each saved config card shows `☁ cloud · 🔒 encrypted` badge when active
 - Falls back to localStorage for anonymous sessions
 
 ### 🇮🇳 Managed / Hosted Providers (No API Key Required)
-
-Two providers are hosted by the AI Council backend — sign in and use them free:
 
 | Provider          | Icon | Notes                                                                   |
 | ----------------- | ---- | ----------------------------------------------------------------------- |
@@ -138,19 +349,7 @@ No endpoint, no API key, no credit card. Just sign in.
 
 ### 🖥 Express Backend & Usage Analytics
 
-Node.js/Express backend (`server.js`) powers managed providers with Firebase Admin auth verification, per-UID rate limiting (30 req/min default), streaming proxy, Firestore usage analytics, session logging, and an admin stats endpoint.
-
-### 🤖 Agent Mode
-
-Single-model 1-on-1 chat with any persona — CEO, Analyst, Coach, Lawyer, and more. Accessible from the setup screen. Supports all providers including Sarvam AI 🇮🇳 and Hosted Ollama for zero-setup conversations.
-
-### ✏ Custom Persona Creator
-
-Build council members beyond the 36 built-ins — define a name, icon, color, and full system prompt. Useful for domain-specific Indian roles: GST Compliance Officer, SEBI Regulatory Advisor, IIT Research Analyst, and so on.
-
-### 📱 PWA — Install to Home Screen
-
-AI Council is a fully installable Progressive Web App. Chrome/Edge/Android shows a native install banner. iOS Safari: tap **Share → Add to Home Screen**. Runs standalone once installed.
+Node.js/Express backend (`server.js`) with Firebase Admin auth verification, per-UID rate limiting (30 req/min default), streaming proxy, Firestore usage analytics, session logging, and an admin stats endpoint.
 
 ---
 
@@ -178,7 +377,7 @@ Cancel at any point — partial results are preserved, a red banner is shown, an
 
 ### ✨ Council Templates
 
-13 pre-built persona structures across Think Tank, Corporate, Professional, and Unfiltered categories — one click to load.
+18 pre-built persona structures across Think Tank, AI Agents, Corporate, Professional, and Unfiltered categories — one click to load.
 
 ### 📥 / 📤 Import / Export Council JSON
 
@@ -186,7 +385,7 @@ Save and reload full council setups. API keys are always stripped from exports.
 
 ### 🔗 Webhook Output
 
-Configure a webhook URL in Settings. After every completed session, AI Council POSTs the full session JSON. Works with Zapier, Make, n8n, Slack, Notion, and Pipedream.
+Configure a webhook URL in Settings. After every completed session, AI Studio POSTs the full session JSON. Works with Zapier, Make, n8n, Slack, Notion, and Pipedream.
 
 ---
 
@@ -281,15 +480,15 @@ Requires Firebase Admin credentials (`GOOGLE_APPLICATION_CREDENTIALS` or GCP ADC
 
 **Backend environment variables:**
 
-| Variable                | Default                     | Description                     |
-| ----------------------- | --------------------------- | ------------------------------- |
-| `PORT`                  | `8103`                      | Server port                     |
-| `OLLAMA_BASE_URL`       | `https://ai.gameinghub.com` | Your Ollama instance            |
-| `SARVAM_API_KEY`        | —                           | Sarvam AI API key               |
-| `MANAGED_OLLAMA_MODELS` | —                           | Comma-separated model list      |
-| `ADMIN_UIDS`            | —                           | Firebase UIDs with admin access |
-| `ALLOWED_ORIGINS`       | `*`                         | CORS origins                    |
-| `RATE_LIMIT_PER_MIN`    | `30`                        | Max requests per UID/minute     |
+| Variable                | Default | Description                     |
+| ----------------------- | ------- | ------------------------------- |
+| `PORT`                  | `8103`  | Server port                     |
+| `OLLAMA_BASE_URL`       | `url`   | Your Ollama instance            |
+| `SARVAM_API_KEY`        | —       | Sarvam AI API key               |
+| `MANAGED_OLLAMA_MODELS` | —       | Comma-separated model list      |
+| `ADMIN_UIDS`            | —       | Firebase UIDs with admin access |
+| `ALLOWED_ORIGINS`       | `*`     | CORS origins                    |
+| `RATE_LIMIT_PER_MIN`    | `30`    | Max requests per UID/minute     |
 
 ---
 
@@ -315,26 +514,40 @@ ai-council/
 ├── src/
 │   ├── components/
 │   │   ├── atoms/index.jsx        # Spin, Badge, Toggle, TemperatureSlider
-│   │   ├── AgentScreen.jsx        # Single-model agent chat mode
+│   │   ├── setup/
+│   │   │   ├── Shell.jsx          # NEW — sidebar + mobile nav layout wrapper
+│   │   │   ├── PageHeader.jsx     # NEW — shared page header component
+│   │   │   ├── design.js          # NEW — shared CSS, NAV_ITEMS, helpers
+│   │   │   └── pages/
+│   │   │       ├── HomePage.jsx       # NEW — landing page
+│   │   │       ├── CouncilPage.jsx    # NEW — council builder (extracted)
+│   │   │       ├── AgentPage.jsx      # NEW — agent chat page
+│   │   │       ├── VoicePage.jsx      # NEW — voice AI page
+│   │   │       └── WhatsAppPage.jsx   # NEW — WhatsApp page
+│   │   ├── AgentScreen.jsx        # Single-model agent chat (40+ personas)
 │   │   ├── AuthGate.jsx           # Firebase auth wrapper + Google sign-in UI
 │   │   ├── DeliberationScreen.jsx # Main 3-stage pipeline orchestrator
 │   │   ├── HistoryModal.jsx       # Past sessions browser
 │   │   ├── InstallPrompt.jsx      # PWA install banner
 │   │   ├── ManagePanel.jsx        # Add / edit / remove council members
+│   │   ├── MCPPanel.jsx           # NEW — MCP server integration panel
 │   │   ├── MemberCard.jsx         # Member row + chairman toggle
 │   │   ├── MemberForm.jsx         # Add/edit member form
-│   │   ├── ModelPicker.jsx        # Searchable model picker
+│   │   ├── ModelPicker.jsx        # NEW — searchable model combobox
 │   │   ├── PersonaCreator.jsx     # Custom persona builder
+│   │   ├── PersonaPicker.jsx      # NEW — searchable grouped persona dropdown
 │   │   ├── ResultsView.jsx        # Stage I / II / III tabs
+│   │   ├── SarvamVoiceChat.jsx    # NEW — voice chat modal
 │   │   ├── SavedConfig.jsx        # Local + cloud config management
 │   │   ├── SettingsModal.jsx      # Webhook config
-│   │   ├── SetupScreen.jsx        # Council builder + template picker
+│   │   ├── SetupScreen.jsx        # REFACTORED — thin 5-page router
 │   │   ├── SystemPromptEditor.jsx # Inline prompt preview + editing
-│   │   └── TemplateCard.jsx       # Template grid card
+│   │   ├── TemplateCard.jsx       # Template grid card
+│   │   └── WhatsAppGateway.jsx    # NEW — WhatsApp connection modal
 │   ├── constants/
-│   │   ├── personas.js            # 36 personas across 8 groups
-│   │   ├── providers.js           # All provider configs incl. managed_sarvam
-│   │   └── templates.js           # 13 council templates
+│   │   ├── personas.js            # 40+ personas across groups
+│   │   ├── providers.js           # All provider configs + getAvailableProviders()
+│   │   └── templates.js           # 18 council templates (incl. AI Agents category)
 │   ├── lib/
 │   │   ├── api.js                 # dispatchMember() — all provider fetch logic
 │   │   ├── auth.js                # Firebase auth, getIdToken, apiFetch, streaming proxy
@@ -434,6 +647,18 @@ Templates load a pre-built persona structure in one click. Set provider, model, 
 | **⚖ Full Council**       | All 5 think-tank personas                            | Maximum deliberation depth                |
 | **✨ Creative Council**  | Visionary + Philosopher + Contrarian + Pragmatist 👑 | Ideation, creative strategy, design       |
 
+### 🤖 AI Agents _(New)_
+
+| Template                          | Members                                                                        | Best for                |
+| --------------------------------- | ------------------------------------------------------------------------------ | ----------------------- |
+| **🔬 Research + Operator**        | Deep Researcher + Web Intelligence + Red Team + Operator 👑                    | Research synthesis      |
+| **⚗️ AI Model Debate**            | Grok + Claude Ethics + Gemini + Canvas + Raw Arbiter 👑                        | Model comparison        |
+| **⚡ Agentic Task Force**         | Task Planner + Full-Stack Builder + Risk Monitor + Orchestrator 👑             | Execution pipelines     |
+| **🔀 Skill Pipeline**             | Skill Composer + Code Architect + Systems Thinker + Executor 👑                | Modular AI workflows    |
+| **🦉 Socratic + Red Team**        | Socratic Tutor + Red Team + Ethics Auditor + Systems Thinker 👑                | Critical reasoning      |
+| **🇮🇳 India Intelligence Council** | Market Intelligence + Cultural Lens + Analyst + Pragmatist 👑                  | India-specific strategy |
+| **🛡️ Tech Ethics Review**         | Code Architect + Ethics Auditor + Risk Monitor + Red Team + Systems Thinker 👑 | Responsible tech        |
+
 ### 🏢 Corporate
 
 | Template               | Members                                              | Best for                  |
@@ -531,6 +756,38 @@ Templates load a pre-built persona structure in one click. Set provider, model, 
 | **The Junior Associate**          | Detail-level review — ambiguous clauses, missed deadlines |
 | **The Senior Partner (Chairman)** | The firm's definitive legal position                      |
 
+### AI Agent Personas _(New)_
+
+| Persona                   | Role                                                |
+| ------------------------- | --------------------------------------------------- |
+| **Deep Researcher**       | Perplexity-style deep research synthesis            |
+| **Web Intelligence**      | Real-time web search and current state tracking     |
+| **Red Team**              | Exploits assumptions, finds vulnerabilities         |
+| **The Operator**          | Converts deliberation into clean, actionable output |
+| **Grok (Irreverent)**     | Unfiltered, contrarian, anti-establishment takes    |
+| **Claude Ethics**         | Safety-first reasoning, harm analysis               |
+| **Gemini Synthesizer**    | Multi-perspective synthesis and balanced views      |
+| **Canvas Writer**         | Long-form structured writing and editing            |
+| **Raw Arbiter**           | No persona — pure model judgment                    |
+| **Task Planner**          | Breaks goals into executable sub-tasks              |
+| **Full-Stack Builder**    | Implementation-focused engineering reasoning        |
+| **Risk Monitor**          | Tracks risk, flags blockers, monitors health        |
+| **Workflow Orchestrator** | Coordinates multi-step AI pipelines                 |
+| **Skill Composer**        | Designs modular AI capabilities                     |
+| **Code Architect**        | System design and engineering decisions             |
+| **Systems Thinker**       | Integration, emergent behavior, feedback loops      |
+| **Devin Executor**        | Autonomous code execution and delivery              |
+| **Socratic Tutor**        | Questions assumptions through Socratic dialogue     |
+
+### India-Specific Personas _(New)_
+
+| Persona                 | Role                                                           |
+| ----------------------- | -------------------------------------------------------------- |
+| **Market Intelligence** | Indian market context, consumer behavior, regulatory landscape |
+| **Cultural Lens**       | Indic cultural context, regional nuance, language sensitivity  |
+| **Sarvam Hindi**        | Hindi-native reasoning via Sarvam AI                           |
+| **Sarvam Indic**        | Indic multilingual reasoning across 10+ languages              |
+
 ### Unfiltered
 
 | Persona       | Role                                          |
@@ -576,7 +833,7 @@ Receives the full transcript (all responses + reviews) and delivers one authorit
 
 ## ✦ Webhook Output
 
-Configure a URL in **⚙ Settings**. After every session, AI Council POSTs:
+Configure a URL in **⚙ Settings**. After every session, AI Studio POSTs:
 
 ```json
 {
@@ -597,7 +854,7 @@ Works with Zapier, Make, n8n, Slack, Notion, Pipedream. Use **🧪 Send Test Pin
 
 ## ✦ Think Block Stripping
 
-Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Council strips these automatically and shows a `🧠 Thinking deeply…` indicator mid-stream. Peer review and Chairman prompts only receive the cleaned output — no thinking noise leaks between stages.
+Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Studio strips these automatically and shows a `🧠 Thinking deeply…` indicator mid-stream. Peer review and Chairman prompts only receive the cleaned output — no thinking noise leaks between stages.
 
 ---
 
@@ -611,7 +868,7 @@ Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Cou
 
 ## ✦ Privacy & Data
 
-- **Managed providers (Sarvam AI, Hosted Ollama):** Requests are proxied through the AI Council backend. Provider, model, stage, and character counts are logged for usage analytics. Raw prompt text is not stored server-side.
+- **Managed providers (Sarvam AI, Hosted Ollama):** Requests are proxied through the AI Studio backend. Provider, model, stage, and character counts are logged for usage analytics. Raw prompt text is not stored server-side.
 - **Self-hosted providers:** All API calls go directly from your browser to the provider. Nothing passes through our backend.
 - **Cloud configs:** API keys are AES-GCM encrypted in your browser before upload. The server only stores ciphertext.
 - **Local storage:** Session history and configs for anonymous users stay in your browser only.
@@ -636,10 +893,11 @@ Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Cou
 - [ ] Web search injection for grounding answers in current data
 - [ ] Token usage / cost tracking per session
 - [ ] Named council presets — save full council with provider + model assignments
-- [ ] WhatsApp Integration — chat with your AI persona on WhatsApp directly
-- [ ] Voice Mode — speak to your persona, hear responses back
+- [x] ~~WhatsApp Integration~~ — shipped ✓
+- [x] ~~Voice Mode~~ — shipped ✓
 - [ ] Document Council — upload a PDF and let the council analyse it
 - [ ] Public Persona Gallery — publish and browse community-created personas
+- [ ] MCP tool use in Council mode — let members call external tools mid-deliberation
 
 ---
 
