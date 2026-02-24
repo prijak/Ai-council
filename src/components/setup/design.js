@@ -48,6 +48,7 @@ export const NAV_ITEMS = [
   { id: "agent",    icon: "🤝", label: "Agent Chat", color: "#f472b6" },
   { id: "voice",    icon: "🎙", label: "Voice AI",   color: "#c084fc", badge: "🇮🇳" },
   { id: "whatsapp", icon: "💬", label: "WhatsApp",   color: "#25d366", badge: "NEW" },
+  { id: "videogen", icon: "🎬", label: "Video Gen",  color: "#c084fc", badge: "NEW" },
 ];
 
 export const ghostBtn = (extra = {}) => ({

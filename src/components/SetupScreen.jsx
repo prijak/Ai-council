@@ -10,6 +10,7 @@
  *   ./setup/pages/AgentPage.jsx
  *   ./setup/pages/VoicePage.jsx
  *   ./setup/pages/WhatsAppPage.jsx
+ *   ./setup/pages/VideoGenPage.jsx
  *
  * Modals (SarvamVoiceChat, WhatsAppGateway) are now mobile-responsive.
  */
@@ -20,6 +21,7 @@ import { CouncilPage } from "./setup/pages/CouncilPage";
 import { AgentPage } from "./setup/pages/AgentPage";
 import { VoicePage } from "./setup/pages/VoicePage";
 import { WhatsAppPage } from "./setup/pages/WhatsAppPage";
+import { VideoGenPage } from "./setup/pages/Videogenpage";
 import { PersonaCreator } from "./PersonaCreator";
 import { SarvamVoiceChat } from "./SarvamVoiceChat";
 import { WhatsAppGateway } from "./WhatsAppGateway";
@@ -48,7 +50,7 @@ export function SetupScreen({
   /** Require login before opening a gated modal */
   const requireAuth = (openFn) => {
     if (!user) {
-      openLogin?.(); // trigger the AuthGate login flow
+      openLogin?.();
       return;
     }
     openFn();
@@ -90,6 +92,7 @@ export function SetupScreen({
             onLaunch={() => requireAuth(() => setShowWhatsApp(true))}
           />
         )}
+        {page === "videogen" && <VideoGenPage />}
       </Shell>
     </>
   );

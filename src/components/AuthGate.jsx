@@ -68,6 +68,15 @@ function LoginScreen({ onSkip, onShowTerms, compact = false }) {
       desc: "No new apps. AI persona in the app you use.",
       badge: "NEW",
     },
+    {
+      id: "videogen",
+      icon: "🎬",
+      title: "Video Gen",
+      sub: "Lip-synced avatars · HD 720p",
+      color: "#c084fc",
+      desc: "Turn any portrait into a talking digital avatar with SkyReels V3.",
+      badge: "NEW",
+    },
   ];
 
   // ── Compact (modal) mode ──────────────────────────────────────────────────
@@ -479,8 +488,8 @@ function LoginScreen({ onSkip, onShowTerms, compact = false }) {
           {[
             ["🧠", "#25d366", "WhatsApp AI"],
             ["🎙️", "#c084fc", "Voice Chat"],
-            ["🇮🇳", "#f97316", "Sarvam AI"],
-            ["🔒", "#a78bfa", "Encrypted"],
+            ["🎬", "#a78bfa", "Video Gen"],
+            ["🔒", "#f97316", "Encrypted"],
           ].map(([icon, color, label]) => (
             <span
               key={label}
@@ -1584,8 +1593,8 @@ export function AuthGate({ children }) {
                   marginBottom: 20,
                 }}
               >
-                Voice chat, WhatsApp assistant & persona chat require a free
-                account — no API key needed.
+                Voice chat, WhatsApp assistant, video generation & persona chat
+                require a free account — no API key needed.
               </p>
               <div
                 style={{
@@ -1599,7 +1608,7 @@ export function AuthGate({ children }) {
                 {[
                   ["🧠", "#25d366", "WhatsApp AI"],
                   ["🎙️", "#f472b6", "Voice Chat"],
-                  ["🎭", "#60a5fa", "Agent Chat"],
+                  ["🎬", "#c084fc", "Video Gen"],
                   ["🇮🇳", "#f97316", "Sarvam AI"],
                 ].map(([icon, color, label]) => (
                   <span

@@ -8,7 +8,7 @@
   ║   Think. Talk. Connect.                           ║
   ║                                                   ║
   ║   Multi-model Council · Agent Chat · Voice AI     ║
-  ║   WhatsApp Integration · 40+ Expert Personas      ║
+  ║   WhatsApp Integration · Video Gen · 40+ Personas ║
   ║                                                   ║
   ╚═══════════════════════════════════════════════════╝
 ```
@@ -36,16 +36,29 @@
 
 > All changes shipped since the last README revision.
 
+### ✦ Video Gen — SkyReels V3 Digital Avatar Videos _(New)_
+
+New `VideoGenPage.jsx` — full lip-sync video generation powered by SkyReels V3:
+
+- Upload a portrait image + audio file → get a lip-synced HD 720p video in 1–3 minutes
+- Audio-driven: SkyReels animates the face to match the speech in your audio clip
+- Upload any local audio file (WAV/MP3) — the server converts it to a public URL automatically before sending to SkyReels (no base64 limitations)
+- Free with your account — server API key used by default; bring your own SkyReels key for your own quota
+- Full generation status flow: **Uploading audio → Submitting → Generating → Complete**
+- Video preview panel with inline player and one-click download
+- Past videos accessible via a slide-over History panel
+- Cost displayed per generation (sourced from SkyReels usage data)
+
 ### ✦ AI Studio — Full App Rebrand & Multi-Page Shell
 
-The app has evolved from a single-screen "AI Council" tool into a full **AI Studio** platform with persistent navigation and five distinct pages.
+The app has evolved from a single-screen "AI Council" tool into a full **AI Studio** platform with persistent navigation and six distinct pages.
 
 - App renamed from **AI Council** → **AI Studio · Bharat · Sarvam AI**
 - New `Shell.jsx` — desktop sidebar (220px) + mobile top header + mobile bottom tab bar in one layout wrapper
 - New `design.js` — shared CSS keyframes, `NAV_ITEMS` constants, `ghostBtn()` and `alertBox()` utility helpers used across all pages
 - `SetupScreen.jsx` refactored into a thin router that delegates rendering to page-level components
 
-### ✦ Five-Page Navigation
+### ✦ Six-Page Navigation
 
 | Page           | Icon | Auth Required                             |
 | -------------- | ---- | ----------------------------------------- |
@@ -54,6 +67,7 @@ The app has evolved from a single-screen "AI Council" tool into a full **AI Stud
 | **Agent Chat** | 🤝   | Yes — shows inline sign-in wall           |
 | **Voice AI**   | 🎙   | Yes — triggers login modal on launch      |
 | **WhatsApp**   | 💬   | Yes — triggers login modal on launch      |
+| **Video Gen**  | 🎬   | Yes — shows inline sign-in wall           |
 
 ### ✦ HomePage — New Landing Page
 
@@ -62,7 +76,7 @@ Replaces the old empty default view:
 - Animated headline: **Think. Talk. Connect.** with multi-color gradient shimmer
 - Eyebrow badge: _Made in Bharat · Powered by Sarvam AI · 🔥 FREE_
 - Floating ambient background orbs (animated radial gradients)
-- 4-column feature card grid (Council, Agent Chat, Voice AI, WhatsApp) — each card navigates to its page
+- 5-column feature card grid (Council, Agent Chat, Voice AI, WhatsApp, Video Gen) — each card navigates to its page
 - Stats strip: **40+ Personas · 10+ Languages · 6+ Providers · Free with login**
 
 ### ✦ CouncilPage — Extracted Page Component
@@ -208,7 +222,7 @@ Managed providers (`managed_sarvam`, `managed_ollama`) are filtered out of the p
 
 Two distinct patterns are used depending on the feature:
 
-- **Soft gate (sign-in wall):** AgentPage renders an inline sign-in prompt instead of the persona grid. The user stays on the page and can see what they would get.
+- **Soft gate (sign-in wall):** AgentPage and VideoGenPage render an inline sign-in prompt instead of the full UI. The user stays on the page and can see what they would get.
 - **Hard gate (login modal):** Voice and WhatsApp pages show their full marketing content freely, but calling `requireAuth()` on the launch button triggers `openLogin()` from `AuthGate` context — which opens the existing login modal overlay without a page change.
 
 ### ✦ Project Structure Update
@@ -224,13 +238,14 @@ src/components/
 │       ├── CouncilPage.jsx    # NEW — council builder (extracted from SetupScreen)
 │       ├── AgentPage.jsx      # NEW — agent chat browse page
 │       ├── VoicePage.jsx      # NEW — voice AI marketing + launch page
-│       └── WhatsAppPage.jsx   # NEW — WhatsApp marketing + launch page
+│       ├── WhatsAppPage.jsx   # NEW — WhatsApp marketing + launch page
+│       └── VideoGenPage.jsx   # NEW — SkyReels V3 avatar video generator
 ├── MCPPanel.jsx               # NEW — MCP server integration
 ├── SarvamVoiceChat.jsx        # NEW — voice chat modal
 ├── WhatsAppGateway.jsx        # NEW — WhatsApp connection modal
 ├── PersonaPicker.jsx          # NEW — searchable grouped persona dropdown
 ├── ModelPicker.jsx            # NEW — searchable model combobox
-└── SetupScreen.jsx            # REFACTORED — now a thin 5-page router
+└── SetupScreen.jsx            # REFACTORED — now a thin 6-page router
 ```
 
 ---
@@ -311,12 +326,76 @@ Your Question
 
 ### Platform Modes
 
-| Mode              | Description                                            | Auth     |
-| ----------------- | ------------------------------------------------------ | -------- |
-| **⚖ Council**     | 3-stage multi-model deliberation with Chairman verdict | Optional |
-| **🤝 Agent Chat** | 1-on-1 conversation with 40+ expert personas           | Required |
-| **🎙 Voice AI**   | Speak in Hindi, Tamil, and 10+ Indian languages        | Required |
-| **💬 WhatsApp**   | AI persona living inside WhatsApp                      | Required |
+| Mode              | Description                                                    | Auth     |
+| ----------------- | -------------------------------------------------------------- | -------- |
+| **⚖ Council**     | 3-stage multi-model deliberation with Chairman verdict         | Optional |
+| **🤝 Agent Chat** | 1-on-1 conversation with 40+ expert personas                   | Required |
+| **🎙 Voice AI**   | Speak in Hindi, Tamil, and 10+ Indian languages                | Required |
+| **💬 WhatsApp**   | AI persona living inside WhatsApp                              | Required |
+| **🎬 Video Gen**  | Lip-synced HD avatar videos from a portrait image + audio clip | Required |
+
+---
+
+## 🎬 Video Gen — SkyReels V3 Avatar Videos
+
+Transform any portrait photo into a talking digital avatar. Upload a face image and an audio clip — SkyReels V3 animates the face to lip-sync with the audio and renders a 720p HD video.
+
+### How to generate a video
+
+1. Sign in with Google (required)
+2. Navigate to **Video Gen** in the sidebar
+3. Enter a prompt describing the scene (e.g. _"The person speaks affectionately to the camera. Use a static shot."_)
+4. Upload a **portrait image** (or paste a public image URL)
+5. Upload an **audio file** (WAV/MP3) or paste a public audio URL
+6. Click **🎬 Generate Video** — the server uploads your audio, submits the job, and polls for completion
+7. Your video appears in the preview panel — watch it inline or download it
+
+### Technical details
+
+| Spec          | Value                                 |
+| ------------- | ------------------------------------- |
+| Model         | SkyReels V3 Single Avatar             |
+| Resolution    | HD 720p                               |
+| Max duration  | 200 seconds                           |
+| Architecture  | DiT + Multimodal                      |
+| Sync type     | Audio-driven lip-sync                 |
+| Audio formats | WAV, MP3 (public URL or local upload) |
+| Image input   | URL or base64 (local upload)          |
+
+### API key
+
+By default your generation uses the **server's SkyReels key** — free with your account, no setup needed. To use your own quota, expand the **🔑 API Key** panel and paste your key from [api.skycoding.ai](https://api.skycoding.ai). Your key is forwarded per-request and never stored.
+
+### Audio upload flow
+
+Local audio files (uploaded from your device) are automatically saved to the server and served at a public URL before being submitted to SkyReels. SkyReels requires a publicly accessible HTTPS URL — it cannot process base64 data URIs directly.
+
+```
+User uploads audio
+       │
+       ▼
+POST /api/videogen/upload-audio
+Server saves file to disk → returns public URL
+       │
+       ▼
+POST /api/videogen/submit
+Submits {prompt, image, audio_url} to SkyReels API
+       │
+       ▼
+GET /api/videogen/:id/status  (polls every 10s)
+       │
+       ▼
+GET /api/videogen/:id/result
+Returns video URL + cost
+```
+
+### Backend environment variables
+
+| Variable            | Default                               | Description                            |
+| ------------------- | ------------------------------------- | -------------------------------------- |
+| `SKYCODING_API_KEY` | —                                     | SkyReels API key (server default key)  |
+| `MEDIA_DIR`         | `/media/prijak/MyDrive/html/AiStudio` | Local path where audio files are saved |
+| `MEDIA_BASE_URL`    | `backendurl/AiStudio`                 | Public base URL for saved audio files  |
 
 ---
 
@@ -349,7 +428,9 @@ No endpoint, no API key, no credit card. Just sign in.
 
 ### 🖥 Express Backend & Usage Analytics
 
-Node.js/Express backend (`server.js`) with Firebase Admin auth verification, per-UID rate limiting (30 req/min default), streaming proxy, Firestore usage analytics, session logging, and an admin stats endpoint.
+Node.js/Express backend (`server.js`) with Firebase Admin auth verification, per-UID rate limiting (30 req/min default), streaming proxy, Firestore usage analytics, session logging, request ID tracing, and an admin stats endpoint.
+
+Every inbound request is assigned a unique `REQ-{timestamp}-{counter}` ID logged alongside method, path, client IP, and token snippet — making it easy to trace a generation end-to-end in Docker logs.
 
 ---
 
@@ -411,19 +492,20 @@ Final Verdict:
 
 ## ✦ Tech Stack
 
-| Layer         | Choice                                                 |
-| ------------- | ------------------------------------------------------ |
-| Framework     | React 19                                               |
-| Styling       | Inline styles + CSS (no Tailwind, no CSS-in-JS lib)    |
-| Fonts         | Syne + DM Sans (Google Fonts)                          |
-| Auth          | Firebase Authentication (Google Sign-In)               |
-| Database      | Firestore (cloud config sync, usage analytics)         |
-| Encryption    | WebCrypto AES-GCM 256 (client-side, before upload)     |
-| Local Storage | `localStorage` (sessions, configs for anonymous users) |
-| Backend       | Node.js + Express (managed providers, analytics)       |
-| Indic AI      | Sarvam AI 🇮🇳 (`sarvam-m`)                              |
-| Build         | Vite 6                                                 |
-| PWA           | vite-plugin-pwa + custom Service Worker                |
+| Layer         | Choice                                                        |
+| ------------- | ------------------------------------------------------------- |
+| Framework     | React 19                                                      |
+| Styling       | Inline styles + CSS (no Tailwind, no CSS-in-JS lib)           |
+| Fonts         | Syne + DM Sans (Google Fonts)                                 |
+| Auth          | Firebase Authentication (Google Sign-In)                      |
+| Database      | Firestore (cloud config sync, usage analytics)                |
+| Encryption    | WebCrypto AES-GCM 256 (client-side, before upload)            |
+| Local Storage | `localStorage` (sessions, configs for anonymous users)        |
+| Backend       | Node.js + Express (managed providers, analytics)              |
+| Indic AI      | Sarvam AI 🇮🇳 (`sarvam-m`)                                     |
+| Video AI      | SkyReels V3 (`skywork-ai/skyreels-v3/standard/single-avatar`) |
+| Build         | Vite 6                                                        |
+| PWA           | vite-plugin-pwa + custom Service Worker                       |
 
 ---
 
@@ -465,13 +547,16 @@ VITE_API_URL=https://your-backend-url.com
 
 Without these, the app runs in local-only mode (no sign-in, no cloud sync, no managed providers).
 
-### Backend Setup (optional — for Sarvam AI + Hosted Ollama)
+### Backend Setup (optional — for Sarvam AI + Hosted Ollama + Video Gen)
 
 ```bash
 PORT=8103 \
 OLLAMA_BASE_URL=https://your-ollama.com \
 SARVAM_API_KEY=sk-... \
+SKYCODING_API_KEY=sk-... \
 MANAGED_OLLAMA_MODELS=mistral-nemo:latest,deepseek-r1:latest,llama3.1:8b \
+MEDIA_DIR=/path/to/your/public/html/folder \
+MEDIA_BASE_URL=https://yourdomain.com/media \
 ADMIN_UIDS=uid1,uid2 \
 node server.js
 ```
@@ -480,15 +565,18 @@ Requires Firebase Admin credentials (`GOOGLE_APPLICATION_CREDENTIALS` or GCP ADC
 
 **Backend environment variables:**
 
-| Variable                | Default | Description                     |
-| ----------------------- | ------- | ------------------------------- |
-| `PORT`                  | `8103`  | Server port                     |
-| `OLLAMA_BASE_URL`       | `url`   | Your Ollama instance            |
-| `SARVAM_API_KEY`        | —       | Sarvam AI API key               |
-| `MANAGED_OLLAMA_MODELS` | —       | Comma-separated model list      |
-| `ADMIN_UIDS`            | —       | Firebase UIDs with admin access |
-| `ALLOWED_ORIGINS`       | `*`     | CORS origins                    |
-| `RATE_LIMIT_PER_MIN`    | `30`    | Max requests per UID/minute     |
+| Variable                | Default                               | Description                          |
+| ----------------------- | ------------------------------------- | ------------------------------------ |
+| `PORT`                  | `8103`                                | Server port                          |
+| `OLLAMA_BASE_URL`       | `backendurl`                          | Your Ollama instance                 |
+| `SARVAM_API_KEY`        | —                                     | Sarvam AI API key                    |
+| `SKYCODING_API_KEY`     | —                                     | SkyReels API key for Video Gen       |
+| `MANAGED_OLLAMA_MODELS` | —                                     | Comma-separated model list           |
+| `MEDIA_DIR`             | `/media/prijak/MyDrive/html/AiStudio` | Local path for audio file uploads    |
+| `MEDIA_BASE_URL`        | `backendurl`                          | Public URL prefix for uploaded files |
+| `ADMIN_UIDS`            | —                                     | Firebase UIDs with admin access      |
+| `ALLOWED_ORIGINS`       | `*`                                   | CORS origins                         |
+| `RATE_LIMIT_PER_MIN`    | `30`                                  | Max requests per UID/minute          |
 
 ---
 
@@ -500,6 +588,21 @@ docker run -p 8080:80 ai-council
 ```
 
 Open `http://localhost:8080`. The Docker image builds the React app and serves via nginx.
+
+**Backend Docker (with Video Gen volume mount):**
+
+```bash
+docker run -d --name=aicouncilbackend --rm -p 8103:8103 \
+  -e PORT=8103 \
+  -e SKYCODING_API_KEY=sk-... \
+  -e MEDIA_DIR=/media/prijak/MyDrive/html/AiStudio \
+  -e MEDIA_BASE_URL=backendurl \
+  -v /media/prijak/MyDrive/html/AiStudio:/media/prijak/MyDrive/html/AiStudio \
+  -v /opt/ai-council/secrets/serviceAccountKey.json:/app/serviceAccountKey.json:ro \
+  aicouncilbackend:latest
+```
+
+> The volume mount is required so the backend can write uploaded audio files to a directory served by your web server.
 
 ---
 
@@ -523,7 +626,8 @@ ai-council/
 │   │   │       ├── CouncilPage.jsx    # NEW — council builder (extracted)
 │   │   │       ├── AgentPage.jsx      # NEW — agent chat page
 │   │   │       ├── VoicePage.jsx      # NEW — voice AI page
-│   │   │       └── WhatsAppPage.jsx   # NEW — WhatsApp page
+│   │   │       ├── WhatsAppPage.jsx   # NEW — WhatsApp page
+│   │   │       └── VideoGenPage.jsx   # NEW — SkyReels V3 avatar video generator
 │   │   ├── AgentScreen.jsx        # Single-model agent chat (40+ personas)
 │   │   ├── AuthGate.jsx           # Firebase auth wrapper + Google sign-in UI
 │   │   ├── DeliberationScreen.jsx # Main 3-stage pipeline orchestrator
@@ -540,7 +644,7 @@ ai-council/
 │   │   ├── SarvamVoiceChat.jsx    # NEW — voice chat modal
 │   │   ├── SavedConfig.jsx        # Local + cloud config management
 │   │   ├── SettingsModal.jsx      # Webhook config
-│   │   ├── SetupScreen.jsx        # REFACTORED — thin 5-page router
+│   │   ├── SetupScreen.jsx        # REFACTORED — thin 6-page router
 │   │   ├── SystemPromptEditor.jsx # Inline prompt preview + editing
 │   │   ├── TemplateCard.jsx       # Template grid card
 │   │   └── WhatsAppGateway.jsx    # NEW — WhatsApp connection modal
@@ -874,6 +978,7 @@ Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Stu
 - **Local storage:** Session history and configs for anonymous users stay in your browser only.
 - **API keys** are never included in JSON exports.
 - **Webhook** is opt-in — nothing is sent without you setting a URL.
+- **Video Gen audio uploads:** Local audio files are saved to the server's media directory and served publicly so SkyReels can fetch them. Files are named `audio_{uid}_{timestamp}.ext` — not guessable, but not private. Use a public audio URL directly if you need privacy.
 
 ---
 
@@ -884,6 +989,7 @@ Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Stu
 - Session history is capped at the last 30 sessions
 - PDF export uses browser print — use Markdown export for richer formatting
 - Managed providers require a signed-in Google account
+- Video Gen requires a public HTTPS URL for both image and audio — local file uploads are handled automatically by the backend
 
 ---
 
@@ -895,9 +1001,11 @@ Reasoning models (`deepseek-r1`, `qwq`) emit `<think>...</think>` blocks. AI Stu
 - [ ] Named council presets — save full council with provider + model assignments
 - [x] ~~WhatsApp Integration~~ — shipped ✓
 - [x] ~~Voice Mode~~ — shipped ✓
+- [x] ~~Video Gen~~ — shipped ✓
 - [ ] Document Council — upload a PDF and let the council analyse it
 - [ ] Public Persona Gallery — publish and browse community-created personas
 - [ ] MCP tool use in Council mode — let members call external tools mid-deliberation
+- [ ] Video Gen history gallery — browse and replay past generated videos
 
 ---
 

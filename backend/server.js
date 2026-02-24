@@ -9,28 +9,64 @@ import pkg from "whatsapp-web.js";
 const { Client, LocalAuth, MessageMedia } = pkg;
 import qrcode from "qrcode";
 import FormDataNode from "form-data";
+import fs from "fs";
+import path from "path";
 
 if (!getApps().length) initializeApp();
 const auth = getAuth();
-const db   = getFirestore();
+const db      = getFirestore();
 
 // ── Env vars ──────────────────────────────────────────────────────────────────
 const PORT                  = process.env.PORT ?? 8103;
 const OLLAMA_BASE_URL       = process.env.OLLAMA_BASE_URL ?? "backendurl";
 const SARVAM_API_KEY        = process.env.SARVAM_API_KEY ?? "";
+const SKYCODING_API_KEY     = process.env.SKYCODING_API_KEY ?? "";   // SkyReels V3 video gen
 const MANAGED_OLLAMA_MODELS = (process.env.MANAGED_OLLAMA_MODELS ?? "").split(",").map(s => s.trim()).filter(Boolean);
 const ADMIN_UIDS            = (process.env.ADMIN_UIDS ?? "").split(",").map(s => s.trim()).filter(Boolean);
 const ALLOWED_ORIGINS       = (process.env.ALLOWED_ORIGINS ?? "*").split(",").map(s => s.trim());
 const RATE_LIMIT_PER_MIN    = parseInt(process.env.RATE_LIMIT_PER_MIN ?? "30");
 const WHATSAPP_ENABLED      = process.env.WHATSAPP_ENABLED === "true";
 const TTS_MODEL             = process.env.SARVAM_TTS_MODEL ?? "bulbul:v3";
+const MEDIA_DIR             = process.env.MEDIA_DIR ?? "/media/prijak/MyDrive/html/AiStudio";
+const MEDIA_BASE_URL        = process.env.MEDIA_BASE_URL ?? "backendurl";
 const STT_MODEL_CHEAP       = "saarika:v2.5";  // plain transcription — cheaper
 const STT_MODEL_SMART       = "saaras:v3";     // translate mode — understands Indic better
 
 // ── Express setup ─────────────────────────────────────────────────────────────
 const app = express();
 app.use(cors({ origin: ALLOWED_ORIGINS.includes("*") ? "*" : ALLOWED_ORIGINS }));
-app.use(express.json());
+app.use(express.json({ limit: "250mb" }));
+app.use(express.urlencoded({ limit: "250mb", extended: true }));
+
+// ── Request logger ────────────────────────────────────────────────────────────
+// Every inbound request gets a short unique ID so you can trace it end-to-end.
+let _reqCounter = 0;
+app.use((req, res, next) => {
+  const id = `REQ-${Date.now()}-${(++_reqCounter).toString().padStart(5, "0")}`;
+  req.reqId = id;
+
+  const ip =
+    (req.headers["x-forwarded-for"] ?? "").split(",")[0].trim() ||
+    req.socket?.remoteAddress ||
+    "unknown";
+
+  const authHeader = req.headers["authorization"] ?? "";
+  const tokenSnippet = authHeader.startsWith("Bearer ")
+    ? authHeader.slice(7, 17) + "…"   // first 10 chars of token — never the full key
+    : "(no token)";
+
+  console.log(
+    `[${id}] ${new Date().toISOString()} ${req.method} ${req.path}` +
+    ` | ip=${ip} | token=${tokenSnippet}`
+  );
+
+  // Log response status when the response finishes
+  res.on("finish", () => {
+    console.log(`[${id}] → ${res.statusCode}`);
+  });
+
+  next();
+});
 
 // multer for audio file uploads (STT)
 const upload = multer({
@@ -1258,6 +1294,265 @@ If you cannot extract both, respond: {"error": "reason"}`,
   });
 
 } // end WHATSAPP_ENABLED
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SKYREELS V3 — VIDEO GENERATION ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+// All calls proxy through here so SKYCODING_API_KEY never leaves the server.
+// Users may optionally send their own key via "x-skycoding-key" header.
+// ═════════════════════════════════════════════════════════════════════════════
+
+const SKYCODING_BASE = "https://api.skycoding.ai";
+const SKYREELS_MODEL = "skywork-ai/skyreels-v3/standard/single-avatar";
+
+/**
+ * Wraps a fetch call with exponential backoff retry on 429.
+ * maxRetries=3, starting delay 2s, doubling each attempt.
+ */
+async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+  let delay = 2000;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const res = await fetch(url, options);
+    if (res.status !== 429) return res;
+    if (attempt === maxRetries) return res;
+    const retryAfter = parseInt(res.headers.get("retry-after") ?? "0") * 1000;
+    const wait = retryAfter > 0 ? retryAfter : delay;
+    console.warn(`[SkyReels] 429 — retrying in ${wait}ms (attempt ${attempt + 1}/${maxRetries})`);
+    await new Promise(r => setTimeout(r, wait));
+    delay *= 2;
+  }
+}
+
+/** Returns the API key to use: user-supplied header takes priority over env var. */
+function resolveSkyCodingKey(req) {
+  const userKey = (req.headers["x-skycoding-key"] ?? "").trim();
+  if (userKey) return { key: userKey, source: "user" };
+  if (SKYCODING_API_KEY) return { key: SKYCODING_API_KEY, source: "server" };
+  throw new Error(
+    "No SkyReels API key configured. Set SKYCODING_API_KEY on the server or provide your own key."
+  );
+}
+
+/**
+ * POST /api/videogen/upload-audio
+ * Accepts a base64 data URI or raw base64 string + mimeType.
+ * Uploads to Firebase Storage and returns a public download URL.
+ * This is needed because SkyReels only accepts public HTTPS URLs — not base64.
+ */
+app.post("/api/videogen/upload-audio", requireAuth, async (req, res) => {
+  const { dataUrl, mimeType = "audio/wav" } = req.body;
+  if (!dataUrl) return res.status(400).json({ error: "dataUrl is required." });
+
+  try {
+    // Strip the data URI prefix if present  e.g. "data:audio/wav;base64,..."
+    const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+    const actualMime = dataUrl.includes(";")
+      ? dataUrl.split(":")[1].split(";")[0]
+      : mimeType;
+
+    const ext = actualMime.split("/")[1]?.split(";")[0] ?? "wav";
+    const filename = `audio_${req.user.uid}_${Date.now()}.${ext}`;
+    const filePath = path.join(MEDIA_DIR, filename);
+
+    // Ensure the directory exists
+    fs.mkdirSync(MEDIA_DIR, { recursive: true });
+
+    const buffer = Buffer.from(base64, "base64");
+    fs.writeFileSync(filePath, buffer);
+
+    const publicUrl = `${MEDIA_BASE_URL}/${filename}`;
+    console.log(`[${req.reqId}] [videogen/upload-audio] saved ${buffer.length} bytes → ${filePath} (${publicUrl})`);
+    res.json({ url: publicUrl });
+  } catch (e) {
+    console.error(`[${req.reqId}] [videogen/upload-audio] error:`, e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/**
+ * POST /api/videogen/submit
+ * Body: { prompt, first_frame_image, audio_url }
+ * Returns: { requestId, keySource }
+ */
+app.post("/api/videogen/submit", requireAuth, async (req, res) => {
+  if (!checkRate(req.user.uid)) {
+    return res.status(429).json({ error: "Rate limit exceeded — try again in a minute." });
+  }
+
+  const { prompt, first_frame_image, audio_url } = req.body;
+  if (!prompt || !first_frame_image || !audio_url) {
+    return res.status(400).json({ error: "prompt, first_frame_image, and audio_url are required." });
+  }
+
+  let keyMeta;
+  try { keyMeta = resolveSkyCodingKey(req); }
+  catch (e) { return res.status(400).json({ error: e.message }); }
+
+  const start = Date.now();
+  try {
+    const upstream = await fetchWithRetry(`${SKYCODING_BASE}/v1/video/submit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${keyMeta.key}`,
+      },
+      body: JSON.stringify({
+        model: SKYREELS_MODEL,
+        prompt,
+        first_frame_image,
+        audios: [audio_url],
+      }),
+    });
+
+    const data = await upstream.json();
+    console.log(`[${req.reqId}] [videogen/submit] SkyReels response:`, JSON.stringify(data));
+    if (data.code !== 200) throw new Error(data.code_msg ?? `SkyReels error (code ${data.code})`);
+
+    const requestId = data.resp_data.request_id;
+
+    // Record job in Firestore for ownership checks on poll/result
+    await db.collection("videogen_jobs").doc(requestId).set({
+      userId:    req.user.uid,
+      userEmail: req.user.email,
+      prompt:    prompt.slice(0, 200),
+      keySource: keyMeta.source,
+      status:    "processing",
+      ts:        new Date(),
+    }).catch(() => {});
+
+    logUsage({
+      uid: req.user.uid, email: req.user.email,
+      provider: "skyreels_v3", model: SKYREELS_MODEL, stage: "submit",
+      inputChars: prompt.length, outputChars: 0,
+      durationMs: Date.now() - start, error: null,
+    });
+
+    res.json({ requestId, keySource: keyMeta.source });
+  } catch (e) {
+    console.error("[videogen/submit]", e.message);
+    logUsage({
+      uid: req.user.uid, email: req.user.email,
+      provider: "skyreels_v3", model: SKYREELS_MODEL, stage: "submit",
+      inputChars: prompt.length, outputChars: 0,
+      durationMs: Date.now() - start, error: e.message,
+    });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/**
+ * GET /api/videogen/:requestId/status
+ * Returns: { status } — "processing" | "success" | "error"
+ */
+app.get("/api/videogen/:requestId/status", requireAuth, async (req, res) => {
+  const { requestId } = req.params;
+
+  const jobDoc = await db.collection("videogen_jobs").doc(requestId).get().catch(() => null);
+  if (!jobDoc?.exists) return res.status(404).json({ error: "Job not found." });
+  if (jobDoc.data().userId !== req.user.uid) return res.status(403).json({ error: "Forbidden." });
+
+  let keyMeta;
+  try { keyMeta = resolveSkyCodingKey(req); }
+  catch (e) { return res.status(400).json({ error: e.message }); }
+
+  try {
+    const upstream = await fetchWithRetry(`${SKYCODING_BASE}/v1/video/${requestId}/status`, {
+      headers: { "Authorization": `Bearer ${keyMeta.key}` },
+    });
+    const data = await upstream.json();
+    console.log(`[${req.reqId}] [videogen/status] SkyReels response:`, JSON.stringify(data));
+    if (data.code !== 200) throw new Error(data.code_msg ?? `Status error (code ${data.code})`);
+
+    const status = data.resp_data.status;
+    const errorMsg = data.resp_data.error_msg ?? data.resp_data.message ?? null;
+
+    if (status === "success" || status === "error") {
+      await db.collection("videogen_jobs").doc(requestId)
+        .update({ status, completedAt: new Date(), ...(errorMsg ? { errorMsg } : {}) })
+        .catch(() => {});
+    }
+
+    if (status === "error") {
+      console.error(`[${req.reqId}] [videogen/status] Job ${requestId} FAILED — SkyReels error_msg:`, errorMsg ?? "(no message in resp_data)");
+    }
+
+    // Return the error reason to the frontend so it can display it
+    res.json({ status, ...(errorMsg ? { errorMsg } : {}) });
+  } catch (e) {
+    console.error("[videogen/status]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/**
+ * GET /api/videogen/:requestId/result
+ * Returns: { videoUrl, cost }
+ */
+app.get("/api/videogen/:requestId/result", requireAuth, async (req, res) => {
+  const { requestId } = req.params;
+
+  const jobDoc = await db.collection("videogen_jobs").doc(requestId).get().catch(() => null);
+  if (!jobDoc?.exists) return res.status(404).json({ error: "Job not found." });
+  if (jobDoc.data().userId !== req.user.uid) return res.status(403).json({ error: "Forbidden." });
+
+  let keyMeta;
+  try { keyMeta = resolveSkyCodingKey(req); }
+  catch (e) { return res.status(400).json({ error: e.message }); }
+
+  try {
+    const upstream = await fetchWithRetry(`${SKYCODING_BASE}/v1/video/${requestId}/result`, {
+      headers: { "Authorization": `Bearer ${keyMeta.key}` },
+    });
+    const data = await upstream.json();
+    console.log(`[${req.reqId}] [videogen/result] SkyReels response:`, JSON.stringify(data));
+    if (data.code !== 200) throw new Error(data.code_msg ?? `Result error (code ${data.code})`);
+
+    const videoUrl = data.resp_data.video_list?.[0] ?? null;
+    const cost     = data.resp_data.usage?.cost ?? null;
+
+    await db.collection("videogen_jobs").doc(requestId)
+      .update({ videoUrl: videoUrl ?? "", cost: cost ?? 0 }).catch(() => {});
+
+    logUsage({
+      uid: req.user.uid, email: req.user.email,
+      provider: "skyreels_v3", model: SKYREELS_MODEL, stage: "result",
+      inputChars: 0, outputChars: 0, durationMs: 0, error: null,
+    });
+
+    res.json({ videoUrl, cost });
+  } catch (e) {
+    console.error("[videogen/result]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/**
+ * GET /api/videogen/history
+ * Returns last 20 completed video jobs for the logged-in user.
+ */
+app.get("/api/videogen/history", requireAuth, async (req, res) => {
+  try {
+    const snap = await db.collection("videogen_jobs")
+      .where("userId", "==", req.user.uid)
+      .where("status", "==", "success")
+      .orderBy("ts", "desc")
+      .limit(20)
+      .get();
+
+    const jobs = snap.docs.map(d => ({
+      requestId:   d.id,
+      prompt:      d.data().prompt,
+      videoUrl:    d.data().videoUrl ?? null,
+      cost:        d.data().cost ?? null,
+      keySource:   d.data().keySource,
+      completedAt: d.data().completedAt?.toDate?.()?.toISOString() ?? null,
+    }));
+
+    res.json({ jobs });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // ── Start server ──────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
